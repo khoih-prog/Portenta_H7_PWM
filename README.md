@@ -13,7 +13,7 @@
 
 * [Why do we need this Portenta_H7_PWM library](#why-do-we-need-this-Portenta_H7_PWM-library)
   * [Features](#features)
-  * [Why using ISR-based Hardware Timer Interrupt is better](#why-using-isr-based-hardware-timer-interrupt-is-better)
+  * [Why using ISR-based PWM is better](#why-using-isr-based-pwm-is-better)
   * [Currently supported Boards](#currently-supported-boards)
   * [Important Notes about ISR](#important-notes-about-isr)
 * [Prerequisites](#prerequisites)
