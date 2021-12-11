@@ -13,9 +13,9 @@
 
 * [Why do we need this Portenta_H7_PWM library](#why-do-we-need-this-Portenta_H7_PWM-library)
   * [Features](#features)
-  * [Why using ISR-based PWM is better](#why-using-isr-based-pwm-is-better)
+  * [Why using hardware-based PWM is better](#why-using-hardware-based-pwm-is-better)
   * [Currently supported Boards](#currently-supported-boards)
-  * [Important Notes about ISR](#important-notes-about-isr)
+* [Changelog](changelog.md)
 * [Prerequisites](#prerequisites)
 * [Installation](#installation)
   * [Use Arduino Library Manager](#use-arduino-library-manager)
@@ -25,19 +25,17 @@
   * [1. For Portenta_H7 boards using Arduino IDE in Linux](#1-for-portenta_h7-boards-using-arduino-ide-in-linux)
 * [More useful Information about STM32 Timers](#more-useful-information-about-stm32-timers)
 * [Available Timers for Portenta_H7](#available-timers-for-portenta_h7)
+* [Portenta_H7 Timer and pin association](#Portenta_H7-Timer-and-pin-association)
 * [Usage](#usage)
-  * [1. Using only Hardware Timer directly](#1-using-only-hardware-timer-directly)
-    * [1.1 Init Hardware Timer](#11-init-hardware-timer)
-    * [1.2 Set PWM Frequency, dutycycle and attach PeriodCallback function](#12-Set-PWM-Frequency-dutycycle-and-attach-PeriodCallback-function)
+  * [1. Prepare PWM settings](#1-Prepare-PWM-settings)
+  * [2. Set PWM Frequency and dutycycle](#2-Set-PWM-Frequency-and-dutycycle)
 * [Examples](#examples)
   * [ 1. PWM_Multi](examples/PWM_Multi)
-  * [ 2. PWM_Multi_Args](examples/PWM_Multi_Args)
-  * [ 3. PWMs_Array_Complex](examples/PWMs_Array_Complex)
+  * [ 2. PWM_Single](examples/PWM_Single)
 * [Example PWM_Multi](#example-PWM_Multi)
 * [Debug Terminal Output Samples](#debug-terminal-output-samples)
-  * [1. PWMs_Array_Complex on PORTENTA_H7_M7](#1-PWMs_Array_Complex-on-PORTENTA_H7_M7)
-  * [2. PWM_Multi_Args on PORTENTA_H7_M7](#2-PWM_Multi_Args-on-PORTENTA_H7_M7)
-  * [3. PWM_Multi on PORTENTA_H7_M7](#3-PWM_Multi-on-PORTENTA_H7_M7)
+  * [1. PWM_Single on PORTENTA_H7_M7](#1-PWM_Single-on-PORTENTA_H7_M7)
+  * [2. PWM_Multi on PORTENTA_H7_M7](#2-PWM_Multi-on-PORTENTA_H7_M7)
 * [Debug](#debug)
 * [Troubleshooting](#troubleshooting)
 * [Issues](#issues)
@@ -59,24 +57,19 @@ This library enables you to use Hardware Timers on an STM32H7-based Portenta_H7 
 
 ---
 
-The most important feature is they're Ipurely hardware-based PWM channels. Therefore, their executions are **not blocked by bad-behaving functions / tasks**. This important feature is absolutely necessary for mission-critical tasks. 
+The most important feature is they're purely hardware-based PWM channels. Therefore, their executions are **not blocked by bad-behaving functions / tasks**. This important feature is absolutely necessary for mission-critical tasks. 
 
 This important feature is absolutely necessary for mission-critical tasks. These hardware timers, using interrupt, still work even if other functions are blocking. Moreover, they are much more precise (certainly depending on clock frequency accuracy) than other software timers using millis() or micros(). That's necessary if you need to measure some data requiring better accuracy.
 
-The [**PWMs_Array_Complex**](examples/PWMs_Array_Complex) example will demonstrate the nearly perfect accuracy, compared to software timers, by printing the actual period / duty-cycle in `microsecs` of each of PWM-channels.
+The [**PWM_Multi**](examples/PWM_Multi) will demonstrate the usage of multichannel PWM using multiple Hardware Timers. The 4 independent Hardware Timers are used **to control 4 different PWM outputs**, with totally independent frequencies and dutycycles. You can **start, stop, change and restore the settings of any PWM channel on-the-fly**.
 
-The [**PWM_Multi_Args**](examples/PWM/PWM_Multi_Args) will demonstrate the usage of multichannel PWM using multiple Hardware Timers. The 4 independent Hardware Timers are used **to control 4 different PWM outputs**, with totally independent frequencies and dutycycles.
-
-Being ISR-based PWM, their executions are not blocked by bad-behaving functions / tasks, such as connecting to WiFi, Internet or Blynk services. You can also have many `(up to 16)` timers to use.
+Being hardware-based PWM, their executions are not blocked by bad-behaving functions / tasks, such as connecting to WiFi, Internet or Blynk services.
 
 This non-being-blocked important feature is absolutely necessary for mission-critical tasks.
 
-You'll see `software-based` SimpleTimer is blocked while system is connecting to WiFi / Internet / Blynk, as well as by blocking task 
-in loop(), using delay() function as an example. The elapsed time then is very unaccurate
-
 ---
 
-#### Why using ISR-based PWM is better
+#### Why using hardware-based PWM is better
 
 Imagine you have a system with a **mission-critical** function, measuring water level and control the sump pump or doing something much more important. You normally use a software timer to poll, or even place the function in loop(). But what if another function is **blocking** the loop() or setup().
 
@@ -101,23 +94,13 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 1. **Portenta_H7 boards** such as Portenta_H7 Rev2 ABX00042, etc., using [**ArduinoCore-mbed mbed_portenta** core](https://github.com/arduino/ArduinoCore-mbed)
 
 ---
-
-#### Important Notes about ISR
-
-1. Inside the attached function, **delay() won’t work and the value returned by millis() will not increment.** Serial data received while in the function may be lost. You should declare as **volatile any variables that you modify within the attached function.**
-
-2. Typically global variables are used to pass data between an ISR and the main program. To make sure variables shared between an ISR and the main program are updated correctly, declare them as volatile.
-
----
 ---
 
 ## Prerequisites
 
  1. [`Arduino IDE 1.8.16+` for Arduino](https://www.arduino.cc/en/Main/Software)
- 2. [`ArduinoCore-mbed mbed_portenta core 2.4.1+`](https://github.com/arduino/ArduinoCore-mbed) for Arduino **Portenta_H7** boards, such as **Portenta_H7 Rev2 ABX00042, etc.**. [![GitHub release](https://img.shields.io/github/release/arduino/ArduinoCore-mbed.svg)](https://github.com/arduino/ArduinoCore-mbed/releases/latest)
+ 2. [`ArduinoCore-mbed mbed_portenta core 2.6.1+`](https://github.com/arduino/ArduinoCore-mbed) for Arduino **Portenta_H7** boards, such as **Portenta_H7 Rev2 ABX00042, etc.**. [![GitHub release](https://img.shields.io/github/release/arduino/ArduinoCore-mbed.svg)](https://github.com/arduino/ArduinoCore-mbed/releases/latest)
 
- 3. To use with certain example
-   - [`SimpleTimer library`](https://github.com/jfturcot/SimpleTimer) for [ISR_16_Timers_Array example](examples/ISR_16_Timers_Array).
 ---
 ---
 
@@ -151,12 +134,12 @@ Another way to install is to:
 
 #### 1. For Portenta_H7 boards using Arduino IDE in Linux
 
-  **To be able to upload firmware to Portenta_H7 using Arduino IDE in Linux (Ubuntu, etc.)**, you have to copy the file [portenta_post_install.sh](Packages_Patches/arduino/hardware/mbed_portenta/2.4.1/portenta_post_install.sh) into mbed_portenta directory (~/.arduino15/packages/arduino/hardware/mbed_portenta/2.4.1/portenta_post_install.sh). 
+  **To be able to upload firmware to Portenta_H7 using Arduino IDE in Linux (Ubuntu, etc.)**, you have to copy the file [portenta_post_install.sh](Packages_Patches/arduino/hardware/mbed_portenta/2.6.1/portenta_post_install.sh) into mbed_portenta directory (~/.arduino15/packages/arduino/hardware/mbed_portenta/2.6.1/portenta_post_install.sh). 
   
   Then run the following command using `sudo`
   
 ```
-$ cd ~/.arduino15/packages/arduino/hardware/mbed_portenta/2.4.1
+$ cd ~/.arduino15/packages/arduino/hardware/mbed_portenta/2.6.1
 $ chmod 755 portenta_post_install.sh
 $ sudo ./portenta_post_install.sh
 ```
@@ -169,9 +152,9 @@ This will create the file `/etc/udev/rules.d/49-portenta_h7.rules` as follows:
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="035b", GROUP="plugdev", MODE="0666"
 ```
 
-Supposing the ArduinoCore-mbed core version is 2.4.1. Now only one file must be copied into the directory:
+Supposing the ArduinoCore-mbed core version is 2.6.1. Now only one file must be copied into the directory:
 
-- `~/.arduino15/packages/arduino/hardware/mbed_portenta/2.4.1/portenta_post_install.sh`
+- `~/.arduino15/packages/arduino/hardware/mbed_portenta/2.6.1/portenta_post_install.sh`
 
 Whenever a new version is installed, remember to copy this files into the new version directory. For example, new version is x.yy.zz
 
@@ -331,6 +314,23 @@ This is the temporary list for Portenta_H7 Timers which can be used. The availab
 
 **TIM2, TIM3, TIM5, TIM6**
 
+---
+
+## Portenta_H7 Timer and pin association
+
+To know which Timer (TIMx) is used for which pin, check [Table 7. STM32H747xI/G pin/ball definition, page 67](https://www.st.com/resource/en/datasheet/stm32h747xi.pdf)
+
+The result for PWM-enable pins can be summarized as follows
+
+```
+#define pinD0    D0       // PH15 / TIM8_CH3N
+#define pinD1    D1       // PK1  / TIM1_CH1, TIM8_CH3
+#define pinD2    D2       // PJ11 / TIM1_CH2, TIM8_CH2N
+#define pinD3    D3       // PG7  / HRTIM_CHE2
+#define pinD4    D4       // PC7  / TIM3_CH2, TIM8_CH2, HRTIM_CHA2
+#define pinD5    D5       // PC6  / TIM3_CH1, TIM8_CH1, HRTIM_CHA1, LPTIM3_OUT
+#define pinD6    D6       // PA8  / HRTIM_CHB2 (TIM1_CH1, TIM8_BKIN2)
+```
 
 ---
 ---
@@ -339,27 +339,44 @@ This is the temporary list for Portenta_H7 Timers which can be used. The availab
 
 Before using any Timer for a PWM channel, you have to make sure the Timer has not been used by any other purpose.
 
-### 1. Using only Hardware Timer directly
-
-#### 1.1 Init Hardware Timer
+### 1. Prepare PWM settings
 
 ```
-HardwareTimer *MyTim = new HardwareTimer(TIM8);
+// Can't use same TimerIndex again, e.g., the D1 and D2, using TIM1, can't be use concurrently
+// That's why D0, D1, D3, D4 and D6 (using TimerIndex 8, 1, HRTIM and 3) are OK together
+
+// Only OK for D0, D1, D2, D4 and D5, PA_0C(D15/A0), PA_1C(D16/A1), 
+// D3, D6, D7, D8, D9, D10, D11, D12, D13, D14, D17(PC_2C/A2), D18(PC_3C/3), PC2(D19/A4) LEDG, LEDB not OK
+#define pinD0    D0       // PH15 / TIM8_CH3N
+#define pinD1    D1       // PK1  / TIM1_CH1, TIM8_CH3
+#define pinD2    D2       // PJ11 / TIM1_CH2, TIM8_CH2N
+#define pinD3    D3       // PG7  / HRTIM_CHE2
+#define pinD4    D4       // PC7  / TIM3_CH2, TIM8_CH2, HRTIM_CHA2
+#define pinD5    D5       // PC6  / TIM3_CH1, TIM8_CH1, HRTIM_CHA1, LPTIM3_OUT
+#define pinD6    D6       // PA8  / HRTIM_CHB2 (TIM1_CH1, TIM8_BKIN2)
+
+// See https://www.st.com/resource/en/datasheet/stm32h747xi.pdf, Table 7, page 53
+// Can't use myPin with same TIMx. For example, 
+// pinD1 and pinD2, using same TIM1, can't be used at the same time
+// pinD4 and pinD5, using same TIM3, can't be used at the same time
+// pinD3 and pinD6 are using HRTIM, so the minimum freq must be ~770Hz 
+uint32_t myPin  = pinD5;
+
+float dutyCycle = 50.0f;
+
+float freq      = 5000.0f;
+
+mbed::PwmOut* pwm   = NULL;
 ```
 
-#### 1.2 Set PWM Frequency, dutycycle and attach PeriodCallback function
+#### 2. Set PWM Frequency and dutycycle
 
 ```
-void PeriodCallback()
-{
-
-}
-
 void setup()
 {
   ....
   
-  MyTim->setPWM(channel, pins, freq, dutyCycle, PeriodCallback);
+  setPWM(pwm, myPin, freq, dutyCycle);
 }  
 ```
 
@@ -369,8 +386,7 @@ void setup()
 ### Examples: 
 
  1. [PWM_Multi](examples/PWM_Multi)
- 2. [PWM_Multi_Args](examples/PWM_Multi_Args)
- 3. [PWMs_Array_Complex](examples/PWMs_Array_Complex)
+ 2. [PWM_Single](examples/PWM_Single)
 
  
 ---
@@ -383,112 +399,114 @@ void setup()
   #error For Portenta_H7 only
 #endif
 
+#define _PWM_LOGLEVEL_       1
+
 #include "Portenta_H7_PWM.h"
 
 #define LED_ON        LOW
 #define LED_OFF       HIGH
 
-//D0,  Instance = 0x40010400, channel = 3, TimerIndex = 7
-//D1,  Instance = 0x40010000, channel = 1, TimerIndex = 0
-//D2,  Instance = 0x40010000, channel = 2, TimerIndex = 0
-//D4,  Instance = 0x40000400, channel = 2, TimerIndex = 2
-//D5,  Instance = 0x40000400, channel = 1, TimerIndex = 2
-// A0-A6
-//A0/D15, Instance = 0x40010400, channel = 3, TimerIndex = 7
-//A1/D16, Instance = 0x40010000, channel = 1, TimerIndex = 0
-
-// Can't use same TimerIndex again, e.g., the D1 and D2 can't be use together as the latter called will override
-// That's why D0, D1 and D4 (using TimerIndex 7,0 ans 2) are OK together
+// Can't use same TimerIndex again, e.g., the D1 and D2, using TIM1, can't be use concurrently
+// That's why D0, D1, D3, D4 and D6 (using TimerIndex 8, 1, HRTIM and 3) are OK together
 
 // Only OK for D0, D1, D2, D4 and D5, PA_0C(D15/A0), PA_1C(D16/A1), 
 // D3, D6, D7, D8, D9, D10, D11, D12, D13, D14, D17(PC_2C/A2), D18(PC_3C/3), PC2(D19/A4) LEDG, LEDB not OK
-#define pin0    D0
-#define pin1    D1
-#define pin2    D2    //D2
-#define pin3    D4
-#define pin4    D5
-#define pin5    PA_0C
-#define pin6    PA_1C
+#define pinD0    D0       // PH15 / TIM8_CH3N
+#define pinD1    D1       // PK1  / TIM1_CH1, TIM8_CH3
+#define pinD2    D2       // PJ11 / TIM1_CH2, TIM8_CH2N
+#define pinD3    D3       // PG7  / HRTIM_CHE2
+#define pinD4    D4       // PC7  / TIM3_CH2, TIM8_CH2, HRTIM_CHA2
+#define pinD5    D5       // PC6  / TIM3_CH1, TIM8_CH1, HRTIM_CHA1, LPTIM3_OUT
+#define pinD6    D6       // PA8  / HRTIM_CHB2 (TIM1_CH1, TIM8_BKIN2)
 
-uint32_t pins[]       = { pin0, pin1, pin2, pin3, pin4, pin5, pin6 };
+// See https://www.st.com/resource/en/datasheet/stm32h747xi.pdf, Table 7, page 53
+// Can't use pins with same TIMx. For example, 
+// pinD1 and pinD2, using same TIM1, can't be used at the same time
+// pinD4 and pinD5, using same TIM3, can't be used at the same time
+// pinD3 and pinD6 are using HRTIM, so the minimum freq must be ~770Hz 
+uint32_t pins[]       = { pinD0, pinD1, pinD3, pinD5, pinD6 };
 
 #define NUM_OF_PINS       ( sizeof(pins) / sizeof(uint32_t) )
 
-uint32_t dutyCycle[NUM_OF_PINS]  = { 10, 20, 30, 50, 70, 90, 100 };
+float dutyCycle[]      = { 50.0f, 50.0f, 50.0f, 50.0f, 50.0f };
 
-uint32_t freq[]       = { 1, 2, 5, 10, 20, 50, 100 };
+float freq[]           = { 1000.0f, 2500.0f, 4000.0f, 5000.0f,  50000.0f };
 
-//TIM_TypeDef *TimerInstance[] = { TIM8, TIM12, TIM13, TIM14, TIM15, TIM16, TIM17 };
-TIM_TypeDef *TimerInstance[] = { TIM1, TIM4, TIM7, TIM8, TIM12, TIM13, TIM14 };
+float curDutyCycle[]   = { 50.0f, 50.0f, 50.0f, 50.0f, 50.0f };
 
-volatile uint32_t callbackTime[] = { 0, 0, 0, 0, 0, 0, 0 };
+float curFreq[]        = { 1000.0f, 2500.0f, 4000.0f, 5000.0f,  50000.0f };
 
-//callback_function_t PeriodCallback0()
-void PeriodCallback0()
+mbed::PwmOut* pwm[]   = { NULL, NULL, NULL, NULL, NULL };
+
+void startAllPWM()
 {
-  static bool ledON = LED_OFF;
-
-  callbackTime[0]++;
-
-  digitalWrite(LEDG, ledON);
-
-  ledON = !ledON;
+  digitalWrite(LEDG, LED_ON);
+  digitalWrite(LEDB, LED_OFF);
+  digitalWrite(LEDR, LED_OFF);
+  
+  for (uint8_t index = 0; index < NUM_OF_PINS; index++)
+  {
+    PWM_LOGERROR7("Freq = ", freq[index], ", \tDutyCycle % = ", dutyCycle[index], ", \tDutyCycle = ", dutyCycle[index] / 100, ", \tPin = ", pins[index]);
+    
+    // setPWM(mbed::PwmOut* &pwm, pin_size_t pin, float frequency, float dutyCycle)
+    setPWM(pwm[index], pins[index], freq[index], dutyCycle[index]);
+  }
 }
 
-void PeriodCallback1()
+void restoreAllPWM()
 {
-  static bool ledON = LED_OFF;
-
-  digitalWrite(LEDB, ledON);
-
-  callbackTime[1]++;
-
-  ledON = !ledON;
+  digitalWrite(LEDG, LED_ON);
+  digitalWrite(LEDB, LED_OFF);
+  digitalWrite(LEDR, LED_OFF);
+  
+  for (uint8_t index = 0; index < NUM_OF_PINS; index++)
+  {
+    curFreq[index]      = freq[index];
+    curDutyCycle[index] = dutyCycle[index];
+    
+    // setPWM(mbed::PwmOut* &pwm, pin_size_t pin, float frequency, float dutyCycle)
+    setPWM(pwm[index], pins[index], freq[index], dutyCycle[index]);
+  }
 }
 
-void PeriodCallback2()
+void changeAllPWM()
 {
-  static bool ledON = LED_OFF;
-
-  digitalWrite(LEDR, ledON);
-
-  callbackTime[2]++;
-
-  ledON = !ledON;
+  digitalWrite(LEDG, LED_OFF);
+  digitalWrite(LEDB, LED_ON);
+  digitalWrite(LEDR, LED_OFF);
+  
+  for (uint8_t index = 0; index < NUM_OF_PINS; index++)
+  {
+    curFreq[index]      = freq[index] * 2;
+    curDutyCycle[index] = dutyCycle[index] / 2;
+    
+    // setPWM(mbed::PwmOut* &pwm, pin_size_t pin, float frequency, float dutyCycle)
+    setPWM(pwm[index], pins[index], curFreq[index], curDutyCycle[index]);
+  }
 }
 
-void PeriodCallback3()
+void stopAllPWM()
 {
-  callbackTime[3]++;
+  digitalWrite(LEDG, LED_OFF);
+  digitalWrite(LEDB, LED_OFF);
+  digitalWrite(LEDR, LED_ON);
+  
+  for (uint8_t index = 0; index < NUM_OF_PINS; index++)
+  {
+    curFreq[index]      = 1000.0f;
+    curDutyCycle[index] = 0.0f;
+    
+    //stopPWM(mbed::PwmOut* &pwm, pin_size_t pin)
+    stopPWM(pwm[index], pins[index]);
+  }
 }
-
-void PeriodCallback4()
-{
-  callbackTime[4]++;
-}
-
-void PeriodCallback5()
-{
-  callbackTime[5]++;
-}
-
-void PeriodCallback6()
-{
-  callbackTime[6]++;
-}
-
-callback_function_t PeriodCallback[] =
-{
-  PeriodCallback0,  PeriodCallback1,  PeriodCallback2,  PeriodCallback3, PeriodCallback4, PeriodCallback5, PeriodCallback6
-};
-
 
 void printLine()
 {
   Serial.println(F("\n=========================================================================================================="));
 }
 
-void printCount()
+void printPulseWidth()
 {
   static uint32_t num = 0;
 
@@ -498,7 +516,7 @@ void printCount()
     
     for (uint8_t index = 0; index < NUM_OF_PINS; index++)
     {
-      Serial.print(F("Count ")); Serial.print(index); Serial.print(F("\t\t"));  
+      Serial.print(F("PW (us) ")); Serial.print(index); Serial.print(F("\t"));  
     }
 
     printLine();
@@ -508,24 +526,71 @@ void printCount()
   {
     for (uint8_t index = 0; index < NUM_OF_PINS; index++)
     {
-      Serial.print(callbackTime[index]); Serial.print(F("\t\t"));  
+      if (pwm[index])
+      {
+        if ( (pins[index] == pinD3) || (pins[index] == pinD6) )
+        {
+          // Using HRTIM => fake by calculating PW
+          Serial.print( (10000 * curDutyCycle[index]) / curFreq[index] ); Serial.print(F("\t\t")); 
+        }
+        else
+        {
+          Serial.print((float) pwm[index]->read_pulsewitdth_us()); Serial.print(F("\t\t")); 
+        }
+      }
     }
 
     Serial.println();
   }
 }
 
-#define PRINT_INTERVAL    10000L
+#define PRINT_INTERVAL      10000L
+#define CHANGE_INTERVAL     20000L
 
 void check_status()
 {
-  static unsigned long checkstatus_timeout = 0;
+  static unsigned long checkstatus_timeout  = 0;
+  static unsigned long changePWM_timeout    = 0;
+
+  static bool PWM_orig  = true;
+  static uint32_t count = 0;
 
   // Print every PRINT_INTERVAL (10) seconds.
   if ((millis() > checkstatus_timeout) || (checkstatus_timeout == 0))
   {
-    printCount();
+    printPulseWidth();
     checkstatus_timeout = millis() + PRINT_INTERVAL;
+  }
+
+  if ( (millis() > changePWM_timeout) && (millis() > CHANGE_INTERVAL) )
+  {
+    
+    if (PWM_orig)
+    {
+      if (count++ %2 == 0)
+      {
+        Serial.println("Stop all PWM");
+        stopAllPWM();
+      }
+      else
+      {
+        Serial.println("Change all PWM");
+        
+        changeAllPWM();
+
+        PWM_orig = !PWM_orig;
+      }
+    }
+    else
+    {
+      Serial.println("Restore all PWM");
+      
+      restoreAllPWM();
+
+      PWM_orig = !PWM_orig;
+    }
+      
+    changePWM_timeout = millis() + CHANGE_INTERVAL;
   }
 }
 
@@ -556,27 +621,7 @@ void setup()
   // Automatically retrieve TIM instance and channel associated to pin
   // This is used to be compatible with all STM32 series automatically.
 
-  for (uint8_t index = 0; index < NUM_OF_PINS; index++)
-  {
-    TIM_TypeDef *Instance = TimerInstance[index];
-
-    // Automatically retrieve TIM instance and channel associated to pin
-    // This is used to be compatible with all STM32 series automatically.
-    //TIM_TypeDef *Instance = (TIM_TypeDef *)pinmap_peripheral(digitalPinToPinName(pins[index]), PinMap_PWM);
-    
-    uint32_t channel = STM_PIN_CHANNEL(pinmap_function(digitalPinToPinName(pins[index]), PinMap_PWM));
-
-    Serial.print("Index = "); Serial.print(index);
-    Serial.print(", Instance = 0x");Serial.print( (uint32_t) Instance, HEX);
-    Serial.print(", channel = ");Serial.print(channel);
-    Serial.print(", TimerIndex = "); Serial.println(get_timer_index(Instance));
-
-    HardwareTimer *MyTim = new HardwareTimer(Instance);
-
-    // void HardwareTimer::setPWM(uint32_t channel, PinName pin, uint32_t frequency, uint32_t dutycycle, 
-    //                            callback_function_t PeriodCallback, callback_function_t CompareCallback)
-    MyTim->setPWM(channel, pins[index], freq[index], 50, PeriodCallback[index]);
-  }
+  startAllPWM();
 }
 
 void loop()
@@ -589,123 +634,77 @@ void loop()
 
 ### Debug Terminal Output Samples
 
-### 1. PWMs_Array_Complex on PORTENTA_H7_M7
+### 1. PWM_Single on PORTENTA_H7_M7
 
-The following is the sample terminal output when running example [PWMs_Array_Complex](examples/PWMs_Array_Complex) on **Portenta_H7** to demonstrate the accuracy of Hardware-based PWM, **especially when system is very busy**.
+The following is the sample terminal output when running example [PWM_Single](examples/PWM_Single) on **Portenta_H7** to demonstrate how to start a single PWM channel, then stop, change, restore the PWM settings on-the-fly.
 
 
 ```
-Starting PWMs_Array_Complex on PORTENTA_H7_M7
-Portenta_H7_PWM v1.0.0
-Index = 0, Instance = 0x40010000, channel = 3, TimerIndex = 0
-Index = 1, Instance = 0x40000800, channel = 1, TimerIndex = 3
-Index = 2, Instance = 0x40010400, channel = 2, TimerIndex = 7
-Index = 3, Instance = 0x40001800, channel = 2, TimerIndex = 8
-SimpleTimer (ms): 2000, us : 12659505, Dus : 9933701
-PWM Channel : 0, programmed Period (us): 500000, actual : 499994, programmed DutyCycle : 20, actual : 20.00
-PWM Channel : 1, programmed Period (us): 200000, actual : 199999, programmed DutyCycle : 30, actual : 30.00
-PWM Channel : 2, programmed Period (us): 100000, actual : 100000, programmed DutyCycle : 50, actual : 50.00
-PWM Channel : 3, programmed Period (us): 10000, actual : 10000, programmed DutyCycle : 70, actual : 70.00
-SimpleTimer (ms): 2000, us : 22594086, Dus : 9934581
-PWM Channel : 0, programmed Period (us): 500000, actual : 499994, programmed DutyCycle : 20, actual : 20.00
-PWM Channel : 1, programmed Period (us): 200000, actual : 199998, programmed DutyCycle : 30, actual : 30.00
-PWM Channel : 2, programmed Period (us): 100000, actual : 99999, programmed DutyCycle : 50, actual : 50.00
-PWM Channel : 3, programmed Period (us): 10000, actual : 10000, programmed DutyCycle : 70, actual : 70.00
-SimpleTimer (ms): 2000, us : 32528951, Dus : 9934865
-PWM Channel : 0, programmed Period (us): 500000, actual : 499994, programmed DutyCycle : 20, actual : 20.00
-PWM Channel : 1, programmed Period (us): 200000, actual : 199999, programmed DutyCycle : 30, actual : 30.00
-PWM Channel : 2, programmed Period (us): 100000, actual : 100000, programmed DutyCycle : 50, actual : 50.00
-PWM Channel : 3, programmed Period (us): 10000, actual : 10001, programmed DutyCycle : 70, actual : 69.99
-SimpleTimer (ms): 2000, us : 42463635, Dus : 9934684
-PWM Channel : 0, programmed Period (us): 500000, actual : 499994, programmed DutyCycle : 20, actual : 20.00
-PWM Channel : 1, programmed Period (us): 200000, actual : 199999, programmed DutyCycle : 30, actual : 30.00
-PWM Channel : 2, programmed Period (us): 100000, actual : 99999, programmed DutyCycle : 50, actual : 50.00
-PWM Channel : 3, programmed Period (us): 10000, actual : 10000, programmed DutyCycle : 70, actual : 69.99
-SimpleTimer (ms): 2000, us : 52398502, Dus : 9934867
-PWM Channel : 0, programmed Period (us): 500000, actual : 499994, programmed DutyCycle : 20, actual : 20.00
-PWM Channel : 1, programmed Period (us): 200000, actual : 199998, programmed DutyCycle : 30, actual : 30.00
-PWM Channel : 2, programmed Period (us): 100000, actual : 99999, programmed DutyCycle : 50, actual : 50.00
-PWM Channel : 3, programmed Period (us): 10000, actual : 10000, programmed DutyCycle : 70, actual : 70.00
+Starting PWM_Single on PORTENTA_H7_M7
+Portenta_H7_PWM v2.0.0
+[PWM] Freq = 5000.00, DutyCycle % = 50.00, DutyCycle = 0.50, Pin = 5
+
+========
+PW (us)
+========
+100.00		
+Stop PWM
+0.00		
+0.00		
+Change PWM
+25.00		
+25.00		
+Restore PWM
+100.00		
+100.00		
+Stop PWM
+0.00		
+0.00		
+Change PWM
+25.00		
+25.00		
+Restore PWM
+100.00		
+100.00
 ```
 
 ---
 
-### 2. PWM_Multi_Args on PORTENTA_H7_M7
+### 2. PWM_Multi on PORTENTA_H7_M7
 
-The following is the sample terminal output when running example [**PWM_Multi_Args**](examples/PWM_Multi_Args) on **Portenta_H7** to demonstrate how to use multiple PWM channels with callback functions with arguments.
-
-```
-Starting PWM_Multi_Args on PORTENTA_H7_M7
-Portenta_H7_PWM v1.0.0
-Index = 0, Instance = 0x40010000, channel = 3, TimerIndex = 0
-Index = 1, Instance = 0x40000800, channel = 1, TimerIndex = 3
-Index = 2, Instance = 0x40001400, channel = 2, TimerIndex = 6
-Index = 3, Instance = 0x40010400, channel = 2, TimerIndex = 7
-Index = 4, Instance = 0x40001800, channel = 1, TimerIndex = 8
-Index = 5, Instance = 0x40001C00, channel = 3, TimerIndex = 9
-Index = 6, Instance = 0x40002000, channel = 1, TimerIndex = 10
-
-==========================================================================================================
-Count 0		Count 1		Count 2		Count 3		Count 4		Count 5		Count 6		
-==========================================================================================================
-10		20		50		100		199		497		993		
-20		40		100		199		397		993		1985		
-30		60		149		298		596		1489		2978		
-40		80		199		398		795		1986		3971		
-50		100		249		497		993		2482		4964		
-60		120		298		596		1192		2979		5957		
-70		139		348		695		1390		3475		6950		
-80		159		398		795		1589		3972		7943		
-90		179		447		894		1788		4469		8937		
-100		199		497		993		1986		4965		9930		
-110		219		547		1093		2185		5462		10923		
-120		239		596		1192		2384		5959		11917		
-130		259		646		1292		2583		6456		12910		
-140		279		696		1391		2781		6952		13904		
-149		298		745		1490		2980		7449		14898		
-159		318		795		1590		3179		7946		15891		
-169		338		845		1689		3377		8443		16885		
-179		358		894		1788		3576		8940		17879		
-189		378		944		1888		3775		9437		18873		
-199		398		994		1987		3974		9934		19867		
-209		418		1044		2087		4173		10431		20861		
-219		438		1093		2186		4371		10928		21855		
-```
-
----
-
-### 3. PWM_Multi on PORTENTA_H7_M7
-
-The following is the sample terminal output when running example [**PWM_Multi**](examples/PWM_Multi) on **Portenta_H7** to demonstrate how to use multiple PWM channels.
+The following is the sample terminal output when running example [**PWM_Multi**](examples/PWM_Multi) on **Portenta_H7** to demonstrate how to start multiple PWM channels, then stop, change, restore the PWM settings on-the-fly.
 
 ```
 Starting PWM_Multi on PORTENTA_H7_M7
-Portenta_H7_PWM v1.0.0
-Index = 0, Instance = 0x40010000, channel = 3, TimerIndex = 0
-Index = 1, Instance = 0x40000800, channel = 1, TimerIndex = 3
-Index = 2, Instance = 0x40001400, channel = 2, TimerIndex = 6
-Index = 3, Instance = 0x40010400, channel = 2, TimerIndex = 7
-Index = 4, Instance = 0x40001800, channel = 1, TimerIndex = 8
-Index = 5, Instance = 0x40001C00, channel = 3, TimerIndex = 9
-Index = 6, Instance = 0x40002000, channel = 1, TimerIndex = 10
+Portenta_H7_PWM v2.0.0
+[PWM] Freq = 1000.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 0
+[PWM] Freq = 2500.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 1
+[PWM] Freq = 4000.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 3
+[PWM] Freq = 5000.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 5
+[PWM] Freq = 50000.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 6
 
 ==========================================================================================================
-Count 0		Count 1		Count 2		Count 3		Count 4		Count 5		Count 6		
+PW (us) 0	PW (us) 1	PW (us) 2	PW (us) 3	PW (us) 4	
 ==========================================================================================================
-10		20		50		100		199		498		995		
-20		40		100		199		398		995		1989		
-30		60		150		299		597		1492		2983		
-40		80		199		398		796		1989		3977		
-50		100		249		498		995		2486		4972		
-60		120		299		597		1194		2983		5966		
-70		140		348		696		1392		3480		6960		
-80		160		398		796		1591		3978		7955		
-90		179		448		895		1790		4475		8949		
-100		199		498		995		1989		4972		9943		
-110		219		547		1094		2188		5469		10938		
-120		239		597		1194		2387		5966		11932		
-130		259		647		1293		2586		6464		12927		
-140		279		697		1393		2785		6961		13921
+500.00		200.00		125.00		100.00		10.00		
+Stop all PWM
+0.00		0.00		0.00		0.00		0.00		
+0.00		0.00		0.00		0.00		0.00		
+Change all PWM
+125.00		50.00		31.25		25.00		2.50		
+125.00		50.00		31.25		25.00		2.50		
+Restore all PWM
+500.00		200.00		125.00		100.00		10.00		
+500.00		200.00		125.00		100.00		10.00		
+Stop all PWM
+0.00		0.00		0.00		0.00		0.00		
+0.00		0.00		0.00		0.00		0.00		
+Change all PWM
+125.00		50.00		31.25		25.00		2.50		
+125.00		50.00		31.25		25.00		2.50		
+Restore all PWM
+500.00		200.00		125.00		100.00		10.00		
+500.00		200.00		125.00		100.00		10.00	
 ```
 
 
@@ -740,6 +739,7 @@ Sometimes, the library will only work if you update the board core to the latest
 Submit issues to: [Portenta_H7_PWM issues](https://github.com/khoih-prog/Portenta_H7_PWM/issues)
 
 ---
+---
 
 ## TO DO
 
@@ -752,6 +752,7 @@ Submit issues to: [Portenta_H7_PWM issues](https://github.com/khoih-prog/Portent
 
 1. Basic hardware multi-channel PWM for **Portenta_H7**.
 2. Add Table of Contents
+3. Rewrite the library to fix bug and to permit to start, stop, modify, restore PWM settings on-the-fly
 
 ---
 ---
@@ -760,12 +761,21 @@ Submit issues to: [Portenta_H7_PWM issues](https://github.com/khoih-prog/Portent
 
 Many thanks for everyone for bug reporting, new feature suggesting, testing and contributing to the development of this library.
 
+1. Thanks to [GitChris3004](https://github.com/GitChris3004) for reporting, investigating the bug in [No PWM-Output signals #1](https://github.com/khoih-prog/Portenta_H7_PWM/issues/1), which is fixed and leading to v2.0.0.
+
+
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/GitChris3004"><img src="https://github.com/GitChris3004.png" width="100px;" alt="GitChris3004"/><br /><sub><b>GitChris3004</b></sub></a><br /></td>
+  </tr>
+</table>
 
 ---
 
 ## Contributing
 
 If you want to contribute to this project:
+
 - Report bugs and errors
 - Ask for enhancements
 - Create issues and pull requests

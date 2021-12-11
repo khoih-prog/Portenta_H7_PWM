@@ -12,11 +12,12 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.0.0
+  Version: 2.0.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0   K.Hoang      21/09/2021 Initial coding for Portenta_H7 using ArduinoCore-mbed mbed_portenta core
+  2.0.0   K.Hoang      10/12/2021 Use new library code and examples
 *****************************************************************************************************************************/
 
 #pragma once
@@ -44,18 +45,37 @@
 #endif
 
 #ifndef PORTENTA_H7_PWM_VERSION
-  #define PORTENTA_H7_PWM_VERSION       "Portenta_H7_PWM v1.0.0"
+  #define PORTENTA_H7_PWM_VERSION       "Portenta_H7_PWM v2.0.0"
 #endif
 
 
 ///////////////////////////////////////////
 
-#include "stm32/HardwareTimer.h"
+#include "Arduino.h"
+#include "pinDefinitions.h"
+#include "PwmOut.h"
 
 ///////////////////////////////////////////
 
+#ifndef _PWM_LOGLEVEL_
+  #define _PWM_LOGLEVEL_       1
+#endif
+
 #include "PWM_Generic_Debug.h"
 
+///////////////////////////////////////////
+
+bool isValidPWMPin(pin_size_t pin);
+
+bool isValidPWMFreq(pin_size_t pin, float frequency);
+
+bool isValidPWMDutyCycle(pin_size_t pin, float dutyCycle);
+
+bool isValidPWMSettings(pin_size_t pin, float frequency, float dutyCycle);
+
+mbed::PwmOut* setPWM(mbed::PwmOut* &pwm, pin_size_t pin, float frequency, float dutyCycle);
+
+mbed::PwmOut* stopPWM(mbed::PwmOut* &pwm, pin_size_t pin);
 
 #endif    // Portenta_H7_PWM_H
 

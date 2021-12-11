@@ -1,5 +1,5 @@
 /****************************************************************************************************************************
-  PWM_Multi.ino
+  PWM_Single.ino
   For Portenta_H7 boards
   Written by Khoi Hoang
 
@@ -45,90 +45,74 @@
 #define pinD6    D6       // PA8  / HRTIM_CHB2 (TIM1_CH1, TIM8_BKIN2)
 
 // See https://www.st.com/resource/en/datasheet/stm32h747xi.pdf, Table 7, page 53
-// Can't use pins with same TIMx. For example, 
+// Can't use myPin with same TIMx. For example, 
 // pinD1 and pinD2, using same TIM1, can't be used at the same time
 // pinD4 and pinD5, using same TIM3, can't be used at the same time
 // pinD3 and pinD6 are using HRTIM, so the minimum freq must be ~770Hz 
-uint32_t pins[]       = { pinD0, pinD1, pinD3, pinD5, pinD6 };
+uint32_t myPin  = pinD5;
 
-#define NUM_OF_PINS       ( sizeof(pins) / sizeof(uint32_t) )
+float dutyCycle = 50.0f;
 
-float dutyCycle[]      = { 50.0f, 50.0f, 50.0f, 50.0f, 50.0f };
+float freq      = 5000.0f;
 
-float freq[]           = { 1000.0f, 2500.0f, 4000.0f, 5000.0f,  50000.0f };
+float curDutyCycle  = dutyCycle;
 
-float curDutyCycle[]   = { 50.0f, 50.0f, 50.0f, 50.0f, 50.0f };
+float curFreq       = freq;
 
-float curFreq[]        = { 1000.0f, 2500.0f, 4000.0f, 5000.0f,  50000.0f };
+mbed::PwmOut* pwm   = NULL;
 
-mbed::PwmOut* pwm[]   = { NULL, NULL, NULL, NULL, NULL };
+void startPWM()
+{
+  digitalWrite(LEDG, LED_ON);
+  digitalWrite(LEDB, LED_OFF);
+  digitalWrite(LEDR, LED_OFF);
 
-void startAllPWM()
+  PWM_LOGERROR7("Freq = ", freq, ", DutyCycle % = ", dutyCycle, ", DutyCycle = ", dutyCycle / 100, ", Pin = ", myPin);
+  setPWM(pwm, myPin, freq, dutyCycle);
+}
+
+void restorePWM()
 {
   digitalWrite(LEDG, LED_ON);
   digitalWrite(LEDB, LED_OFF);
   digitalWrite(LEDR, LED_OFF);
   
-  for (uint8_t index = 0; index < NUM_OF_PINS; index++)
-  {
-    PWM_LOGERROR7("Freq = ", freq[index], ", \tDutyCycle % = ", dutyCycle[index], ", \tDutyCycle = ", dutyCycle[index] / 100, ", \tPin = ", pins[index]);
-    
-    // setPWM(mbed::PwmOut* &pwm, pin_size_t pin, float frequency, float dutyCycle)
-    setPWM(pwm[index], pins[index], freq[index], dutyCycle[index]);
-  }
-}
-
-void restoreAllPWM()
-{
-  digitalWrite(LEDG, LED_ON);
-  digitalWrite(LEDB, LED_OFF);
-  digitalWrite(LEDR, LED_OFF);
+  curFreq      = freq;
+  curDutyCycle = dutyCycle;
   
-  for (uint8_t index = 0; index < NUM_OF_PINS; index++)
-  {
-    curFreq[index]      = freq[index];
-    curDutyCycle[index] = dutyCycle[index];
-    
-    // setPWM(mbed::PwmOut* &pwm, pin_size_t pin, float frequency, float dutyCycle)
-    setPWM(pwm[index], pins[index], freq[index], dutyCycle[index]);
-  }
+  // setPWM(mbed::PwmOut* &pwm, pin_size_t pin, float frequency, float dutyCycle)
+  setPWM(pwm, myPin, freq, dutyCycle);
 }
 
-void changeAllPWM()
+void changePWM()
 {
   digitalWrite(LEDG, LED_OFF);
   digitalWrite(LEDB, LED_ON);
   digitalWrite(LEDR, LED_OFF);
   
-  for (uint8_t index = 0; index < NUM_OF_PINS; index++)
-  {
-    curFreq[index]      = freq[index] * 2;
-    curDutyCycle[index] = dutyCycle[index] / 2;
-    
-    // setPWM(mbed::PwmOut* &pwm, pin_size_t pin, float frequency, float dutyCycle)
-    setPWM(pwm[index], pins[index], curFreq[index], curDutyCycle[index]);
-  }
+  curFreq      = freq * 2;
+  curDutyCycle = dutyCycle / 2;
+  
+  // setPWM(mbed::PwmOut* &pwm, pin_size_t pin, float frequency, float dutyCycle)
+  setPWM(pwm, myPin, curFreq, curDutyCycle);
 }
 
-void stopAllPWM()
+void stopMyPWM()
 {
   digitalWrite(LEDG, LED_OFF);
   digitalWrite(LEDB, LED_OFF);
   digitalWrite(LEDR, LED_ON);
   
-  for (uint8_t index = 0; index < NUM_OF_PINS; index++)
-  {
-    curFreq[index]      = 1000.0f;
-    curDutyCycle[index] = 0.0f;
-    
-    //stopPWM(mbed::PwmOut* &pwm, pin_size_t pin)
-    stopPWM(pwm[index], pins[index]);
-  }
+  curFreq      = 1000.0f;
+  curDutyCycle = 0.0f;
+  
+  //stopPWM(mbed::PwmOut* &pwm, pin_size_t pin)
+  stopPWM(pwm, myPin);
 }
 
 void printLine()
 {
-  Serial.println(F("\n=========================================================================================================="));
+  Serial.println(F("\n========"));
 }
 
 void printPulseWidth()
@@ -139,29 +123,23 @@ void printPulseWidth()
   {
     printLine();
     
-    for (uint8_t index = 0; index < NUM_OF_PINS; index++)
-    {
-      Serial.print(F("PW (us) ")); Serial.print(index); Serial.print(F("\t"));  
-    }
+    Serial.print(F("PW (us)"));
 
     printLine();
   }
  
   if (num > 1)
   {
-    for (uint8_t index = 0; index < NUM_OF_PINS; index++)
+    if (pwm)
     {
-      if (pwm[index])
+      if ( (myPin == pinD3) || (myPin == pinD6) )
       {
-        if ( (pins[index] == pinD3) || (pins[index] == pinD6) )
-        {
-          // Using HRTIM => fake by calculating PW
-          Serial.print( (10000 * curDutyCycle[index]) / curFreq[index] ); Serial.print(F("\t\t")); 
-        }
-        else
-        {
-          Serial.print((float) pwm[index]->read_pulsewitdth_us()); Serial.print(F("\t\t")); 
-        }
+        // Using HRTIM => fake by calculating PW
+        Serial.print( (10000 * curDutyCycle) / curFreq ); Serial.print(F("\t\t")); 
+      }
+      else
+      {
+        Serial.print((float) pwm->read_pulsewitdth_us()); Serial.print(F("\t\t")); 
       }
     }
 
@@ -194,23 +172,23 @@ void check_status()
     {
       if (count++ %2 == 0)
       {
-        Serial.println("Stop all PWM");
-        stopAllPWM();
+        Serial.println("Stop PWM");
+        stopMyPWM();
       }
       else
       {
-        Serial.println("Change all PWM");
+        Serial.println("Change PWM");
         
-        changeAllPWM();
+        changePWM();
 
         PWM_orig = !PWM_orig;
       }
     }
     else
     {
-      Serial.println("Restore all PWM");
+      Serial.println("Restore PWM");
       
-      restoreAllPWM();
+      restorePWM();
 
       PWM_orig = !PWM_orig;
     }
@@ -229,24 +207,21 @@ void setup()
   digitalWrite(LEDB, LED_OFF);
   digitalWrite(LEDR, LED_OFF);
 
-  for (uint8_t index = 0; index < NUM_OF_PINS; index++)
-  {
-    pinMode(pins[index], OUTPUT);
-    digitalWrite(pins[index], LOW);
-  }
+  pinMode(myPin, OUTPUT);
+  digitalWrite(myPin, LOW);
 
   Serial.begin(115200);
   while (!Serial);
 
   delay(100);
 
-  Serial.print(F("\nStarting PWM_Multi on ")); Serial.println(BOARD_NAME);
+  Serial.print(F("\nStarting PWM_Single on ")); Serial.println(BOARD_NAME);
   Serial.println(PORTENTA_H7_PWM_VERSION);
 
   // Automatically retrieve TIM instance and channel associated to pin
   // This is used to be compatible with all STM32 series automatically.
 
-  startAllPWM();
+  startPWM();
 }
 
 void loop()

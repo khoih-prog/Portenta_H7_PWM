@@ -12,12 +12,17 @@
 ## Table of Contents
 
 * [Changelog](#changelog)
+  * [Releases v2.0.0](#Releases-v200)
   * [Initial Releases v1.0.0](#Initial-Releases-v100)
 
 ---
 ---
 
 ## Changelog
+
+### Releases v2.0.0
+
+1. Completely new code to fix no PWM output issue. Check [No PWM-Output signals #1](https://github.com/khoih-prog/Portenta_H7_PWM/issues/1)
 
 ### Initial Releases v1.0.0
 
