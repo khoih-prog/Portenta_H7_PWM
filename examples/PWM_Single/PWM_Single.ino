@@ -12,12 +12,13 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 2.0.0
+  Version: 2.0.1
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0   K.Hoang      21/09/2021 Initial coding for Portenta_H7 using ArduinoCore-mbed mbed_portenta core
   2.0.0   K.Hoang      10/12/2021 Use new library code and examples
+  2.0.1   K.Hoang      11/12/2021 Fix PWM_Multi example. Temporary fix polarity for HRTIM PWM
 *****************************************************************************************************************************/
 
 #if !( defined(ARDUINO_PORTENTA_H7_M7) || defined(ARDUINO_PORTENTA_H7_M4) )
@@ -45,10 +46,10 @@
 #define pinD6    D6       // PA8  / HRTIM_CHB2 (TIM1_CH1, TIM8_BKIN2)
 
 // See https://www.st.com/resource/en/datasheet/stm32h747xi.pdf, Table 7, page 53
-// Can't use myPin with same TIMx. For example, 
+// Can't use pins with same TIMx. For example, 
 // pinD1 and pinD2, using same TIM1, can't be used at the same time
 // pinD4 and pinD5, using same TIM3, can't be used at the same time
-// pinD3 and pinD6 are using HRTIM, so the minimum freq must be ~770Hz 
+// pinD3 and pinD6 are using HRTIM, can't be used at the same time and the minimum freq must be ~770Hz 
 uint32_t myPin  = pinD5;
 
 float dutyCycle = 50.0f;

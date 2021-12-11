@@ -12,12 +12,13 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 2.0.0
+  Version: 2.0.1
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0   K.Hoang      21/09/2021 Initial coding for Portenta_H7 using ArduinoCore-mbed mbed_portenta core
   2.0.0   K.Hoang      10/12/2021 Use new library code and examples
+  2.0.1   K.Hoang      11/12/2021 Fix PWM_Multi example. Temporary fix polarity for HRTIM PWM
 *****************************************************************************************************************************/
 
 #if !( defined(ARDUINO_PORTENTA_H7_M7) || defined(ARDUINO_PORTENTA_H7_M4) )
@@ -48,20 +49,20 @@
 // Can't use pins with same TIMx. For example, 
 // pinD1 and pinD2, using same TIM1, can't be used at the same time
 // pinD4 and pinD5, using same TIM3, can't be used at the same time
-// pinD3 and pinD6 are using HRTIM, so the minimum freq must be ~770Hz 
-uint32_t pins[]       = { pinD0, pinD1, pinD3, pinD5, pinD6 };
+// pinD3 and pinD6 are using HRTIM, can't be used at the same time and the minimum freq must be ~770Hz 
+uint32_t pins[]       = { pinD0, pinD1, pinD3, pinD5 };
 
 #define NUM_OF_PINS       ( sizeof(pins) / sizeof(uint32_t) )
 
-float dutyCycle[]      = { 50.0f, 50.0f, 50.0f, 50.0f, 50.0f };
+float dutyCycle[]      = { 50.0f, 50.0f, 50.0f, 50.0f };
 
-float freq[]           = { 1000.0f, 2500.0f, 4000.0f, 5000.0f,  50000.0f };
+float freq[]           = { 1000.0f, 2500.0f, 4000.0f, 5000.0f };
 
-float curDutyCycle[]   = { 50.0f, 50.0f, 50.0f, 50.0f, 50.0f };
+float curDutyCycle[]   = { 50.0f, 50.0f, 50.0f, 50.0f };
 
-float curFreq[]        = { 1000.0f, 2500.0f, 4000.0f, 5000.0f,  50000.0f };
+float curFreq[]        = { 1000.0f, 2500.0f, 4000.0f, 5000.0f };
 
-mbed::PwmOut* pwm[]   = { NULL, NULL, NULL, NULL, NULL };
+mbed::PwmOut* pwm[]    = { NULL, NULL, NULL, NULL };
 
 void startAllPWM()
 {

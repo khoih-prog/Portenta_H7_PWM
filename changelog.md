@@ -12,6 +12,7 @@
 ## Table of Contents
 
 * [Changelog](#changelog)
+  * [Releases v2.0.1](#Releases-v201)
   * [Releases v2.0.0](#Releases-v200)
   * [Initial Releases v1.0.0](#Initial-Releases-v100)
 
@@ -19,6 +20,11 @@
 ---
 
 ## Changelog
+
+### Releases v2.0.1
+
+1. Fix PWM_Multi example by not using HRTIM pinD3 and pinD6 at the same time
+2. Temporary fix polarity for HRTIM PWM for core v2.6.1-. Check [Portenta: PWM on HRTIM has inverted corner case values #352](https://github.com/arduino/ArduinoCore-mbed/issues/352). To be modified when the issue is fixed.
 
 ### Releases v2.0.0
 

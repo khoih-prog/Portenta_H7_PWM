@@ -12,12 +12,13 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 2.0.0
+  Version: 2.0.1
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0   K.Hoang      21/09/2021 Initial coding for Portenta_H7 using ArduinoCore-mbed mbed_portenta core
   2.0.0   K.Hoang      10/12/2021 Use new library code and examples
+  2.0.1   K.Hoang      11/12/2021 Fix PWM_Multi example. Temporary fix polarity for HRTIM PWM
 *****************************************************************************************************************************/
 
 #ifndef _PWM_LOGLEVEL_
@@ -54,15 +55,27 @@ bool isValidPWMDutyCycle(pin_size_t pin, float dutyCycle)
   return true;
 }
 
+bool isUsingHRTIM(pin_size_t pin)
+{
+  if ( (pin == D3) || (pin == D6) )
+  {
+    PWM_LOGDEBUG1("Using HRTIM pin = ", pin);
+    
+    return true;
+  }
+
+  return false;
+}
+
 // Will calculate accurate min freq if necessary, depending on Portenta Clock
 #define MIN_HRTIM_PWM_FREQ      800
 
 // Check if freq > 0 and if HRTIM => freq >= MIN_HRTIM_PWM_FREQ
 bool isValidPWMFreq(pin_size_t pin, float frequency)
 {
-  if ( (frequency <= 0) || ( ( (pin == D3) || (pin == D6) ) && ( frequency < MIN_HRTIM_PWM_FREQ ) ) )
+  if ( (frequency <= 0) || ( isUsingHRTIM(pin) && ( frequency < MIN_HRTIM_PWM_FREQ ) ) )
   {
-    if ((pin == D3) || (pin == D6))
+    if (isUsingHRTIM(pin))
     {
       PWM_LOGERROR5("Bad HRTIM Freq = ", frequency, ", pin = ", pin, ", must be >= ", MIN_HRTIM_PWM_FREQ);
     }
@@ -79,9 +92,9 @@ bool isValidPWMFreq(pin_size_t pin, float frequency)
 
 bool isValidPWMSettings(pin_size_t pin, float frequency, float dutyCycle)
 {
-  if ( (frequency <= 0) || ( ( (pin == D3) || (pin == D6) ) && ( frequency < MIN_HRTIM_PWM_FREQ ) ) )
+  if ( (frequency <= 0) || ( isUsingHRTIM(pin) && ( frequency < MIN_HRTIM_PWM_FREQ ) ) )
   {
-    if ((pin == D3) || (pin == D6))
+    if (isUsingHRTIM(pin))
     {
       PWM_LOGERROR5("Bad HRTIM Freq = ", frequency, ", pin = ", pin, ", must be >= ", MIN_HRTIM_PWM_FREQ);
     }
@@ -147,7 +160,16 @@ mbed::PwmOut* setPWM(mbed::PwmOut* &pwm, pin_size_t pin, float frequency, float 
 
 mbed::PwmOut* stopPWM(mbed::PwmOut* &pwm, pin_size_t pin)
 {
-  return setPWM(pwm, pin, 1000.0f, 0.0f);
+  if (isUsingHRTIM(pin))
+  {
+    // Check https://github.com/arduino/ArduinoCore-mbed/issues/352
+    // Will remove when the bug is fixed
+    return setPWM(pwm, pin, 1000.0f, 100.0f);
+  }
+  else
+  {
+    return setPWM(pwm, pin, 1000.0f, 0.0f);
+  }
 }
 
 

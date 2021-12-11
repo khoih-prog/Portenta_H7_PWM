@@ -423,20 +423,20 @@ void setup()
 // Can't use pins with same TIMx. For example, 
 // pinD1 and pinD2, using same TIM1, can't be used at the same time
 // pinD4 and pinD5, using same TIM3, can't be used at the same time
-// pinD3 and pinD6 are using HRTIM, so the minimum freq must be ~770Hz 
-uint32_t pins[]       = { pinD0, pinD1, pinD3, pinD5, pinD6 };
+// pinD3 and pinD6 are using HRTIM, can't be used at the same time and the minimum freq must be ~770Hz 
+uint32_t pins[]       = { pinD0, pinD1, pinD3, pinD5 };
 
 #define NUM_OF_PINS       ( sizeof(pins) / sizeof(uint32_t) )
 
-float dutyCycle[]      = { 50.0f, 50.0f, 50.0f, 50.0f, 50.0f };
+float dutyCycle[]      = { 50.0f, 50.0f, 50.0f, 50.0f };
 
-float freq[]           = { 1000.0f, 2500.0f, 4000.0f, 5000.0f,  50000.0f };
+float freq[]           = { 1000.0f, 2500.0f, 4000.0f, 5000.0f };
 
-float curDutyCycle[]   = { 50.0f, 50.0f, 50.0f, 50.0f, 50.0f };
+float curDutyCycle[]   = { 50.0f, 50.0f, 50.0f, 50.0f };
 
-float curFreq[]        = { 1000.0f, 2500.0f, 4000.0f, 5000.0f,  50000.0f };
+float curFreq[]        = { 1000.0f, 2500.0f, 4000.0f, 5000.0f };
 
-mbed::PwmOut* pwm[]   = { NULL, NULL, NULL, NULL, NULL };
+mbed::PwmOut* pwm[]    = { NULL, NULL, NULL, NULL };
 
 void startAllPWM()
 {
@@ -641,7 +641,7 @@ The following is the sample terminal output when running example [PWM_Single](ex
 
 ```
 Starting PWM_Single on PORTENTA_H7_M7
-Portenta_H7_PWM v2.0.0
+Portenta_H7_PWM v2.0.1
 [PWM] Freq = 5000.00, DutyCycle % = 50.00, DutyCycle = 0.50, Pin = 5
 
 ========
@@ -675,36 +675,36 @@ Restore PWM
 The following is the sample terminal output when running example [**PWM_Multi**](examples/PWM_Multi) on **Portenta_H7** to demonstrate how to start multiple PWM channels, then stop, change, restore the PWM settings on-the-fly.
 
 ```
+
 Starting PWM_Multi on PORTENTA_H7_M7
-Portenta_H7_PWM v2.0.0
+Portenta_H7_PWM v2.0.1
 [PWM] Freq = 1000.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 0
 [PWM] Freq = 2500.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 1
 [PWM] Freq = 4000.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 3
 [PWM] Freq = 5000.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 5
-[PWM] Freq = 50000.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 6
 
 ==========================================================================================================
-PW (us) 0	PW (us) 1	PW (us) 2	PW (us) 3	PW (us) 4	
+PW (us) 0	PW (us) 1	PW (us) 2	PW (us) 3	
 ==========================================================================================================
-500.00		200.00		125.00		100.00		10.00		
+500.00		200.00		125.00		100.00		
 Stop all PWM
-0.00		0.00		0.00		0.00		0.00		
-0.00		0.00		0.00		0.00		0.00		
+0.00		0.00		0.00		0.00		
+0.00		0.00		0.00		0.00		
 Change all PWM
-125.00		50.00		31.25		25.00		2.50		
-125.00		50.00		31.25		25.00		2.50		
+125.00		50.00		31.25		25.00		
+125.00		50.00		31.25		25.00		
 Restore all PWM
-500.00		200.00		125.00		100.00		10.00		
-500.00		200.00		125.00		100.00		10.00		
+500.00		200.00		125.00		100.00		
+500.00		200.00		125.00		100.00		
 Stop all PWM
-0.00		0.00		0.00		0.00		0.00		
-0.00		0.00		0.00		0.00		0.00		
+0.00		0.00		0.00		0.00		
+0.00		0.00		0.00		0.00		
 Change all PWM
-125.00		50.00		31.25		25.00		2.50		
-125.00		50.00		31.25		25.00		2.50		
+125.00		50.00		31.25		25.00		
+125.00		50.00		31.25		25.00		
 Restore all PWM
-500.00		200.00		125.00		100.00		10.00		
-500.00		200.00		125.00		100.00		10.00	
+500.00		200.00		125.00		100.00		
+500.00		200.00		125.00		100.00	
 ```
 
 

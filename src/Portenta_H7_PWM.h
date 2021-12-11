@@ -12,12 +12,13 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 2.0.0
+  Version: 2.0.1
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0   K.Hoang      21/09/2021 Initial coding for Portenta_H7 using ArduinoCore-mbed mbed_portenta core
   2.0.0   K.Hoang      10/12/2021 Use new library code and examples
+  2.0.1   K.Hoang      11/12/2021 Fix PWM_Multi example. Temporary fix polarity for HRTIM PWM
 *****************************************************************************************************************************/
 
 #pragma once
@@ -45,7 +46,7 @@
 #endif
 
 #ifndef PORTENTA_H7_PWM_VERSION
-  #define PORTENTA_H7_PWM_VERSION       "Portenta_H7_PWM v2.0.0"
+  #define PORTENTA_H7_PWM_VERSION       "Portenta_H7_PWM v2.0.1"
 #endif
 
 
@@ -70,6 +71,8 @@ bool isValidPWMPin(pin_size_t pin);
 bool isValidPWMFreq(pin_size_t pin, float frequency);
 
 bool isValidPWMDutyCycle(pin_size_t pin, float dutyCycle);
+
+bool isUsingHRTIM(pin_size_t pin);
 
 bool isValidPWMSettings(pin_size_t pin, float frequency, float dutyCycle);
 
