@@ -23,6 +23,7 @@
 ### Releases v2.0.0
 
 1. Completely new code to fix no PWM output issue. Check [No PWM-Output signals #1](https://github.com/khoih-prog/Portenta_H7_PWM/issues/1)
+2. To permit start, stop, change and restore the settings of any PWM channel on-the-fly
 
 ### Initial Releases v1.0.0
 
