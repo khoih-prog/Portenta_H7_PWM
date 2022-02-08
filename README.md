@@ -13,6 +13,7 @@
 
 ## Table of Contents
 
+* [Important Change from v2.0.2](#Important-Change-from-v202)
 * [Why do we need this Portenta_H7_PWM library](#why-do-we-need-this-Portenta_H7_PWM-library)
   * [Features](#features)
   * [Why using hardware-based PWM is better](#why-using-hardware-based-pwm-is-better)
@@ -23,6 +24,7 @@
   * [Use Arduino Library Manager](#use-arduino-library-manager)
   * [Manual Install](#manual-install)
   * [VS Code & PlatformIO](#vs-code--platformio)
+* [HOWTO Fix `Multiple Definitions` Linker Error](#howto-fix-multiple-definitions-linker-error) 
 * [Packages' Patches](#packages-patches)
   * [1. For Portenta_H7 boards using Arduino IDE in Linux](#1-for-portenta_h7-boards-using-arduino-ide-in-linux)
 * [More useful Information about STM32 Timers](#more-useful-information-about-stm32-timers)
@@ -34,6 +36,7 @@
 * [Examples](#examples)
   * [ 1. PWM_Multi](examples/PWM_Multi)
   * [ 2. PWM_Single](examples/PWM_Single)
+  * [ 3. multiFileProject](examples/multiFileProject). **New**
 * [Example PWM_Multi](#example-PWM_Multi)
 * [Debug Terminal Output Samples](#debug-terminal-output-samples)
   * [1. PWM_Single on PORTENTA_H7_M7](#1-PWM_Single-on-PORTENTA_H7_M7)
@@ -47,6 +50,14 @@
 * [Contributing](#contributing)
 * [License](#license)
 * [Copyright](#copyright)
+
+---
+---
+
+### Important Change from v2.0.2
+
+From v2.0.2, `h-only` style is used for this library.
+Please have a look at [HOWTO Fix `Multiple Definitions` Linker Error](#howto-fix-multiple-definitions-linker-error)
 
 ---
 ---
@@ -101,7 +112,7 @@ The catch is **your function is now part of an ISR (Interrupt Service Routine), 
 ## Prerequisites
 
  1. [`Arduino IDE 1.8.19+` for Arduino](https://github.com/arduino/Arduino). [![GitHub release](https://img.shields.io/github/release/arduino/Arduino.svg)](https://github.com/arduino/Arduino/releases/latest)
- 2. [`ArduinoCore-mbed mbed_portenta core 2.6.1+`](https://github.com/arduino/ArduinoCore-mbed) for Arduino **Portenta_H7** boards, such as **Portenta_H7 Rev2 ABX00042, etc.**. [![GitHub release](https://img.shields.io/github/release/arduino/ArduinoCore-mbed.svg)](https://github.com/arduino/ArduinoCore-mbed/releases/latest)
+ 2. [`ArduinoCore-mbed mbed_portenta core 2.7.2+`](https://github.com/arduino/ArduinoCore-mbed) for Arduino **Portenta_H7** boards, such as **Portenta_H7 Rev2 ABX00042, etc.**. [![GitHub release](https://img.shields.io/github/release/arduino/ArduinoCore-mbed.svg)](https://github.com/arduino/ArduinoCore-mbed/releases/latest)
 
 ---
 ---
@@ -129,6 +140,31 @@ Another way to install is to:
 3. Install [**Portenta_H7_PWM** library](https://platformio.org/lib/show/12853/Portenta_H7_PWM) by using [Library Manager](https://platformio.org/lib/show/12853/Portenta_H7_PWM/installation). Search for **Portenta_H7_PWM** in [Platform.io Author's Libraries](https://platformio.org/lib/search?query=author:%22Khoi%20Hoang%22)
 4. Use included [platformio.ini](platformio/platformio.ini) file from examples to ensure that all dependent libraries will installed automatically. Please visit documentation for the other options and examples at [Project Configuration File](https://docs.platformio.org/page/projectconf.html)
 
+
+---
+---
+
+### HOWTO Fix `Multiple Definitions` Linker Error
+
+The current library implementation, using `xyz-Impl.h` instead of standard `xyz.cpp`, possibly creates certain `Multiple Definitions` Linker error in certain use cases.
+
+You can include this `.hpp` file
+
+```
+// Can be included as many times as necessary, without `Multiple Definitions` Linker Error
+#include "Portenta_H7_PWM.hpp"    //https://github.com/khoih-prog/Portenta_H7_PWM
+```
+
+in many files. But be sure to use the following `.h` file **in just 1 `.h`, `.cpp` or `.ino` file**, which must **not be included in any other file**, to avoid `Multiple Definitions` Linker Error
+
+```
+// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
+#include "Portenta_H7_PWM.h"      //https://github.com/khoih-prog/Portenta_H7_PWM
+```
+
+Check the new [**multiFileProject** example](examples/multiFileProject) for a `HOWTO` demo.
+
+
 ---
 ---
 
@@ -136,12 +172,12 @@ Another way to install is to:
 
 #### 1. For Portenta_H7 boards using Arduino IDE in Linux
 
-  **To be able to upload firmware to Portenta_H7 using Arduino IDE in Linux (Ubuntu, etc.)**, you have to copy the file [portenta_post_install.sh](Packages_Patches/arduino/hardware/mbed_portenta/2.6.1/portenta_post_install.sh) into mbed_portenta directory (~/.arduino15/packages/arduino/hardware/mbed_portenta/2.6.1/portenta_post_install.sh). 
+  **To be able to upload firmware to Portenta_H7 using Arduino IDE in Linux (Ubuntu, etc.)**, you have to copy the file [portenta_post_install.sh](Packages_Patches/arduino/hardware/mbed_portenta/2.7.2/portenta_post_install.sh) into mbed_portenta directory (~/.arduino15/packages/arduino/hardware/mbed_portenta/2.7.2/portenta_post_install.sh). 
   
   Then run the following command using `sudo`
   
 ```
-$ cd ~/.arduino15/packages/arduino/hardware/mbed_portenta/2.6.1
+$ cd ~/.arduino15/packages/arduino/hardware/mbed_portenta/2.7.2
 $ chmod 755 portenta_post_install.sh
 $ sudo ./portenta_post_install.sh
 ```
@@ -154,9 +190,9 @@ This will create the file `/etc/udev/rules.d/49-portenta_h7.rules` as follows:
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="035b", GROUP="plugdev", MODE="0666"
 ```
 
-Supposing the ArduinoCore-mbed core version is 2.6.1. Now only one file must be copied into the directory:
+Supposing the ArduinoCore-mbed core version is 2.7.2. Now only one file must be copied into the directory:
 
-- `~/.arduino15/packages/arduino/hardware/mbed_portenta/2.6.1/portenta_post_install.sh`
+- `~/.arduino15/packages/arduino/hardware/mbed_portenta/2.7.2/portenta_post_install.sh`
 
 Whenever a new version is installed, remember to copy this files into the new version directory. For example, new version is x.yy.zz
 
@@ -389,6 +425,7 @@ void setup()
 
  1. [PWM_Multi](examples/PWM_Multi)
  2. [PWM_Single](examples/PWM_Single)
+ 3. [**multiFileProject**](examples/multiFileProject) **New**
 
  
 ---
@@ -403,6 +440,7 @@ void setup()
 
 #define _PWM_LOGLEVEL_       1
 
+// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
 #include "Portenta_H7_PWM.h"
 
 #define LED_ON        LOW
@@ -643,7 +681,7 @@ The following is the sample terminal output when running example [PWM_Single](ex
 
 ```
 Starting PWM_Single on PORTENTA_H7_M7
-Portenta_H7_PWM v2.0.1
+Portenta_H7_PWM v2.0.2
 [PWM] Freq = 5000.00, DutyCycle % = 50.00, DutyCycle = 0.50, Pin = 5
 
 ========
@@ -679,7 +717,7 @@ The following is the sample terminal output when running example [**PWM_Multi**]
 ```
 
 Starting PWM_Multi on PORTENTA_H7_M7
-Portenta_H7_PWM v2.0.1
+Portenta_H7_PWM v2.0.2
 [PWM] Freq = 1000.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 0
 [PWM] Freq = 2500.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 1
 [PWM] Freq = 4000.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 3
@@ -755,6 +793,9 @@ Submit issues to: [Portenta_H7_PWM issues](https://github.com/khoih-prog/Portent
 1. Basic hardware multi-channel PWM for **Portenta_H7**.
 2. Add Table of Contents
 3. Rewrite the library to fix bug and to permit to start, stop, modify, restore PWM settings on-the-fly
+4. Optimize library code by using `reference-passing` instead of `value-passing`
+5. Convert to `h-only` style
+
 
 ---
 ---

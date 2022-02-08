@@ -12,6 +12,7 @@
 ## Table of Contents
 
 * [Changelog](#changelog)
+  * [Releases v2.0.2](#Releases-v202)
   * [Releases v2.0.1](#Releases-v201)
   * [Releases v2.0.0](#Releases-v200)
   * [Initial Releases v1.0.0](#Initial-Releases-v100)
@@ -20,6 +21,13 @@
 ---
 
 ## Changelog
+
+### Releases v2.0.2
+
+1. Convert to `h-only` code
+2. Optimize library code by using `reference-passing` instead of `value-passing`
+3. Add example [multiFileProject](examples/multiFileProject) to demo for multiple-file project
+4. Update `Packages_Patches` and test with new ArduinoCore-mbed `mbed_portenta core v2.7.2`
 
 ### Releases v2.0.1
 

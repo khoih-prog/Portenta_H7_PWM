@@ -12,13 +12,14 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 2.0.1
+  Version: 2.0.2
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0   K.Hoang      21/09/2021 Initial coding for Portenta_H7 using ArduinoCore-mbed mbed_portenta core
   2.0.0   K.Hoang      10/12/2021 Use new library code and examples
   2.0.1   K.Hoang      11/12/2021 Fix PWM_Multi example. Temporary fix polarity for HRTIM PWM
+  2.0.2   K.Hoang      07/02/2022 Convert to h-only. Optimize code.
  *****************************************************************************************************************************/
 
 #pragma once
@@ -54,9 +55,6 @@ const char PWM_SPACE[] = " ";
 #define PWM_PRINT_MARK   PWM_PRINT(PWM_MARK)
 #define PWM_PRINT_SP     PWM_PRINT(PWM_SPACE)
 #define PWM_PRINT_LINE   PWM_PRINT(PWM_LINE)
-
-///////////////////////////////////////
-
 
 ///////////////////////////////////////
 
@@ -97,38 +95,5 @@ const char PWM_SPACE[] = " ";
 #define PWM_LOGDEBUG3(x,y,z,w)  if(_PWM_LOGLEVEL_>3) { PWM_PRINT_MARK; PWM_PRINT(x); PWM_PRINT_SP; PWM_PRINT(y); PWM_PRINT_SP; PWM_PRINT(z); PWM_PRINT_SP; PWM_PRINTLN(w); }
 #define PWM_LOGDEBUG5(x,y,z,w,xx,yy) if(_PWM_LOGLEVEL_>3) { PWM_PRINT_MARK; PWM_PRINT(x); PWM_PRINT(y); PWM_PRINT(z); PWM_PRINT(w); PWM_PRINT(xx); PWM_PRINTLN(yy); }
 #define PWM_LOGDEBUG7(x,y,z,w,xx,yy,zz,ww) if(_PWM_LOGLEVEL_>3) { PWM_PRINT_MARK; PWM_PRINT(x); PWM_PRINT(y); PWM_PRINT(z); PWM_PRINT(w); PWM_PRINT(xx); PWM_PRINT(yy); PWM_PRINT(zz); PWM_PRINTLN(ww);}
-
-
-
-#if 0
-
-#define PWM_LOGERROR(x)         if(_PWM_LOGLEVEL_>0) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.println(x); }
-#define PWM_LOGERROR0(x)        if(_PWM_LOGLEVEL_>0) { PWM_DBG_PORT.print(x); }
-#define PWM_LOGERRORLN0(x)      if(_PWM_LOGLEVEL_>0) { PWM_DBG_PORT.println(x); }
-#define PWM_LOGERROR1(x,y)      if(_PWM_LOGLEVEL_>0) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.print(x); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.println(y); }
-#define PWM_LOGERROR2(x,y,z)    if(_PWM_LOGLEVEL_>0) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.print(x); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.print(y); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.println(z); }
-#define PWM_LOGERROR3(x,y,z,w)  if(_PWM_LOGLEVEL_>0) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.print(x); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.print(y); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.print(z); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.println(w); }
-
-#define PWM_LOGWARN(x)          if(_PWM_LOGLEVEL_>1) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.println(x); }
-#define PWM_LOGWARN0(x)         if(_PWM_LOGLEVEL_>1) { PWM_DBG_PORT.print(x); }
-#define PWM_LOGWARNLN0(x)       if(_PWM_LOGLEVEL_>1) { PWM_DBG_PORT.println(x); }
-#define PWM_LOGWARN1(x,y)       if(_PWM_LOGLEVEL_>1) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.print(x); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.println(y); }
-#define PWM_LOGWARN2(x,y,z)     if(_PWM_LOGLEVEL_>1) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.print(x); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.print(y); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.println(z); }
-#define PWM_LOGWARN3(x,y,z,w)   if(_PWM_LOGLEVEL_>1) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.print(x); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.print(y); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.print(z); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.println(w); }
-
-#define PWM_LOGINFO(x)          if(_PWM_LOGLEVEL_>2) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.println(x); }
-#define PWM_LOGINFO0(x)         if(_PWM_LOGLEVEL_>2) { PWM_DBG_PORT.print(x); }
-#define PWM_LOGINFOLN0(x)       if(_PWM_LOGLEVEL_>2) { PWM_DBG_PORT.println(x); }
-#define PWM_LOGINFO1(x,y)       if(_PWM_LOGLEVEL_>2) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.print(x); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.println(y); }
-#define PWM_LOGINFO2(x,y,z)     if(_PWM_LOGLEVEL_>2) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.print(x); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.print(y); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.println(z); }
-#define PWM_LOGINFO3(x,y,z,w)   if(_PWM_LOGLEVEL_>2) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.print(x); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.print(y); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.print(z); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.println(w); }
-
-#define PWM_LOGDEBUG(x)         if(_PWM_LOGLEVEL_>3) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.println(x); }
-#define PWM_LOGDEBUG0(x)        if(_PWM_LOGLEVEL_>3) { PWM_DBG_PORT.print(x); }
-#define PWM_LOGDEBUGLN0(x)      if(_PWM_LOGLEVEL_>3) { PWM_DBG_PORT.println(x); }
-#define PWM_LOGDEBUG1(x,y)      if(_PWM_LOGLEVEL_>3) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.print(x); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.println(y); }
-#define PWM_LOGDEBUG2(x,y,z)    if(_PWM_LOGLEVEL_>3) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.print(x); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.print(y); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.println(z); }
-#define PWM_LOGDEBUG3(x,y,z,w)  if(_PWM_LOGLEVEL_>3) { PWM_DBG_PORT.print("[PWM] "); PWM_DBG_PORT.print(x); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.print(y); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.print(z); PWM_DBG_PORT.print(" "); PWM_DBG_PORT.println(w); }
-#endif
 
 #endif    //PWM_GENERIC_DEBUG_H
