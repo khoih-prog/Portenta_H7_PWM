@@ -68,6 +68,22 @@ Please have a look at [HOWTO Fix `Multiple Definitions` Linker Error](#howto-fix
 
 This library enables you to use Hardware Timers on an STM32H7-based Portenta_H7 board to create and output PWM to pins. 
 
+This library is using the **same or similar functions** as other FastPWM libraries, as follows, to enable you to **port your PWM code easily between platforms**
+
+- [**RP2040_PWM**](https://github.com/khoih-prog/RP2040_PWM)
+- [**AVR_PWM**](https://github.com/khoih-prog/AVR_PWM)
+- [**megaAVR_PWM**](https://github.com/khoih-prog/megaAVR_PWM)
+- [**ESP32_FastPWM**](https://github.com/khoih-prog/ESP32_FastPWM)
+- [**SAMD_PWM**](https://github.com/khoih-prog/SAMD_PWM)
+- [**SAMDUE_PWM**](https://github.com/khoih-prog/SAMDUE_PWM)
+- [**nRF52_PWM**](https://github.com/khoih-prog/nRF52_PWM)
+- [**ATtiny_PWM**](https://github.com/khoih-prog/ATtiny_PWM)
+- [**Teensy_PWM**](https://github.com/khoih-prog/Teensy_PWM)
+- [**MBED_RP2040_PWM**](https://github.com/khoih-prog/MBED_RP2040_PWM)
+- [**nRF52_MBED_PWM**](https://github.com/khoih-prog/nRF52_MBED_PWM)
+- [**STM32_PWM**](https://github.com/khoih-prog/STM32_PWM)
+
+
 ---
 
 The most important feature is they're purely hardware-based PWM channels. Therefore, their executions are **not blocked by bad-behaving functions / tasks**. This important feature is absolutely necessary for mission-critical tasks. 
