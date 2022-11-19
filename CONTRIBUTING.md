@@ -31,7 +31,7 @@ Arduino IDE version: 1.8.19
 `ArduinoCore-mbed` mbed_portenta core v3.4.1
 Portenta_H7 Rev2 ABX00042
 OS: Ubuntu 20.04 LTS
-Linux xy-Inspiron-3593 5.4.0-99-generic #112-Ubuntu SMP Thu Feb 3 13:50:55 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+Linux xy-Inspiron-3593 5.15.0-52-generic #58~20.04.1-Ubuntu SMP Thu Oct 13 13:09:46 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
 
 Context:
 I encountered a crash while using this library

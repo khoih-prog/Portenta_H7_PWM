@@ -2,11 +2,16 @@
 
 [![arduino-library-badge](https://www.ardu-badge.com/badge/Portenta_H7_PWM.svg?)](https://www.ardu-badge.com/Portenta_H7_PWM)
 [![GitHub release](https://img.shields.io/github/release/khoih-prog/Portenta_H7_PWM.svg)](https://github.com/khoih-prog/Portenta_H7_PWM/releases)
-[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/khoih-prog/Portenta_H7_PWM/blob/master/LICENSE)
+[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/khoih-prog/Portenta_H7_PWM/blob/main/LICENSE)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](#Contributing)
 [![GitHub issues](https://img.shields.io/github/issues/khoih-prog/Portenta_H7_PWM.svg)](http://github.com/khoih-prog/Portenta_H7_PWM/issues)
 
-<a href="https://www.buymeacoffee.com/khoihprog6" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
+<a href="https://www.buymeacoffee.com/khoihprog6" title="Donate to my libraries using BuyMeACoffee"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Donate to my libraries using BuyMeACoffee" style="height: 50px !important;width: 181px !important;" ></a>
+<a href="https://www.buymeacoffee.com/khoihprog6" title="Donate to my libraries using BuyMeACoffee"><img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-orange.svg?logo=buy-me-a-coffee&logoColor=FFDD00" style="height: 20px !important;width: 200px !important;" ></a>
+<a href="https://profile-counter.glitch.me/khoih-prog/count.svg" title="Total khoih-prog Visitor count"><img src="https://profile-counter.glitch.me/khoih-prog/count.svg" style="height: 30px;width: 200px;"></a>
+<a href="https://profile-counter.glitch.me/khoih-prog-Portenta_H7_PWM/count.svg" title="Portenta_H7_PWM Visitor count"><img src="https://profile-counter.glitch.me/khoih-prog-Portenta_H7_PWM/count.svg" style="height: 30px;width: 200px;"></a>
+
 
 ---
 ---
@@ -90,7 +95,7 @@ This library is using the **same or similar functions** as other FastPWM librari
 
 The most important feature is they're purely hardware-based PWM channels. Therefore, their executions are **not blocked by bad-behaving functions / tasks**. This important feature is absolutely necessary for mission-critical tasks. 
 
-This important feature is absolutely necessary for mission-critical tasks. These hardware timers, using interrupt, still work even if other functions are blocking. Moreover, they are much more precise (certainly depending on clock frequency accuracy) than other software timers using millis() or micros(). That's necessary if you need to measure some data requiring better accuracy.
+This important feature is absolutely necessary for mission-critical tasks. These hardware timers, using interrupt, still work even if other functions are blocking. Moreover, they are much more precise (certainly depending on clock frequency accuracy) than other software timers using `millis()` or `micros()`. That's necessary if you need to measure some data requiring better accuracy.
 
 The [**PWM_Multi**](examples/PWM_Multi) will demonstrate the usage of multichannel PWM using multiple Hardware Timers. The 4 independent Hardware Timers are used **to control 4 different PWM outputs**, with totally independent frequencies and dutycycles. You can **start, stop, change and restore the settings of any PWM channel on-the-fly**.
 
@@ -110,9 +115,9 @@ You'd prefer to have your function called, no matter what happening with other f
 
 The correct choice is to use a Hardware Timer with **Interrupt** to call your function.
 
-These hardware timers, using interrupt, still work even if other functions are blocking. Moreover, they are much more **precise** (certainly depending on clock frequency accuracy) than other software timers using millis() or micros(). That's necessary if you need to measure some data requiring better accuracy.
+These hardware timers, using interrupt, still work even if other functions are blocking. Moreover, they are much more **precise** (certainly depending on clock frequency accuracy) than other software timers using `millis()` or `micros()`. That's necessary if you need to measure some data requiring better accuracy.
 
-Functions using normal software timers, relying on loop() and calling millis(), won't work if the loop() or setup() is blocked by certain operation. For example, certain function is blocking while it's connecting to WiFi or some services.
+Functions using normal software timers, relying on `loop()` and calling `millis()`, won't work if the `loop()` or `setup()` is blocked by certain operation. For example, certain function is blocking while it's connecting to WiFi or some services.
 
 The catch is **your function is now part of an ISR (Interrupt Service Routine), and must be lean / mean, and follow certain rules.** More to read on:
 
@@ -147,9 +152,9 @@ You can also use this link [![arduino-library-badge](https://www.ardu-badge.com/
 Another way to install is to:
 
 1. Navigate to [**Portenta_H7_PWM**](https://github.com/khoih-prog/Portenta_H7_PWM) page.
-2. Download the latest release `Portenta_H7_PWM-master.zip`.
-3. Extract the zip file to `Portenta_H7_PWM-master` directory 
-4. Copy whole `Portenta_H7_PWM-master` folder to Arduino libraries' directory such as `~/Arduino/libraries/`.
+2. Download the latest release `Portenta_H7_PWM-main.zip`.
+3. Extract the zip file to `Portenta_H7_PWM-main` directory 
+4. Copy whole `Portenta_H7_PWM-main` folder to Arduino libraries' directory such as `~/Arduino/libraries/`.
 
 ### VS Code & PlatformIO
 
@@ -168,14 +173,14 @@ The current library implementation, using `xyz-Impl.h` instead of standard `xyz.
 
 You can include this `.hpp` file
 
-```
+```cpp
 // Can be included as many times as necessary, without `Multiple Definitions` Linker Error
 #include "Portenta_H7_PWM.hpp"    //https://github.com/khoih-prog/Portenta_H7_PWM
 ```
 
 in many files. But be sure to use the following `.h` file **in just 1 `.h`, `.cpp` or `.ino` file**, which must **not be included in any other file**, to avoid `Multiple Definitions` Linker Error
 
-```
+```cpp
 // To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
 #include "Portenta_H7_PWM.h"      //https://github.com/khoih-prog/Portenta_H7_PWM
 ```
@@ -250,7 +255,7 @@ To be sure which Timer is available for the board you're using, check the Core P
 
 The information will be as follows:
 
-```
+```cpp
 typedef struct
 {
   __IO uint32_t CR1;         /*!< TIM control register 1,                   Address offset: 0x00 */
@@ -285,7 +290,7 @@ typedef struct
 
 and
 
-```
+```cpp
 #define PERIPH_BASE            0x40000000UL /*!< Base address of : AHB/ABP Peripherals   
 /*!< Peripheral memory map */
 #define APB1PERIPH_BASE        PERIPH_BASE
@@ -378,7 +383,7 @@ To know which Timer (TIMx) is used for which pin, check [Table 7. STM32H747xI/G 
 
 The result for PWM-enable pins can be summarized as follows
 
-```
+```cpp
 #define pinD0    D0       // PH15 / TIM8_CH3N
 #define pinD1    D1       // PK1  / TIM1_CH1, TIM8_CH3
 #define pinD2    D2       // PJ11 / TIM1_CH2, TIM8_CH2N
@@ -397,7 +402,7 @@ Before using any Timer for a PWM channel, you have to make sure the Timer has no
 
 ### 1. Prepare PWM settings
 
-```
+```cpp
 // Can't use same TimerIndex again, e.g., the D1 and D2, using TIM1, can't be use concurrently
 // That's why D0, D1, D3, D4 and D6 (using TimerIndex 8, 1, HRTIM and 3) are OK together
 
@@ -427,7 +432,7 @@ mbed::PwmOut* pwm   = NULL;
 
 #### 2. Set PWM Frequency and dutycycle
 
-```
+```cpp
 void setup()
 {
   ....
@@ -451,7 +456,7 @@ void setup()
 
 ### Example [PWM_Multi](examples/PWM_Multi)
 
-```
+```cpp
 #if !( defined(ARDUINO_PORTENTA_H7_M7) || defined(ARDUINO_PORTENTA_H7_M4) )
   #error For Portenta_H7 only
 #endif
@@ -697,7 +702,7 @@ void loop()
 The following is the sample terminal output when running example [PWM_Single](examples/PWM_Single) on **Portenta_H7** to demonstrate how to start a single PWM channel, then stop, change, restore the PWM settings on-the-fly.
 
 
-```
+```cpp
 Starting PWM_Single on PORTENTA_H7_M7
 Portenta_H7_PWM v2.0.2
 [PWM] Freq = 5000.00, DutyCycle % = 50.00, DutyCycle = 0.50, Pin = 5
@@ -732,7 +737,7 @@ Restore PWM
 
 The following is the sample terminal output when running example [**PWM_Multi**](examples/PWM_Multi) on **Portenta_H7** to demonstrate how to start multiple PWM channels, then stop, change, restore the PWM settings on-the-fly.
 
-```
+```cpp
 
 Starting PWM_Multi on PORTENTA_H7_M7
 Portenta_H7_PWM v2.0.2
@@ -846,12 +851,12 @@ If you want to contribute to this project:
 
 ### License
 
-- The library is licensed under [MIT](https://github.com/khoih-prog/Portenta_H7_PWM/blob/master/LICENSE)
+- The library is licensed under [MIT](https://github.com/khoih-prog/Portenta_H7_PWM/blob/main/LICENSE)
 
 ---
 
 ## Copyright
 
-Copyright 2021- Khoi Hoang
+Copyright (c) 2021- Khoi Hoang
 
 
