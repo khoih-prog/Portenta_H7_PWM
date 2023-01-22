@@ -16,6 +16,7 @@
 ## Table of Contents
 
 * [Changelog](#changelog)
+  * [Releases v2.0.3](#Releases-v203)
   * [Releases v2.0.2](#Releases-v202)
   * [Releases v2.0.1](#Releases-v201)
   * [Releases v2.0.0](#Releases-v200)
@@ -25,6 +26,10 @@
 ---
 
 ## Changelog
+
+### Releases v2.0.3
+
+1. Add example [PWM_StepperControl](https://github.com/khoih-prog/Portenta_H7_PWM/examples/PWM_StepperControl) to demo how to control Stepper Motor using PWM. Check [Using PWM to step a stepper driver #16](https://github.com/khoih-prog/RP2040_PWM/issues/16)
 
 ### Releases v2.0.2
 

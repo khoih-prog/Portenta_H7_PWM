@@ -6,13 +6,7 @@
   Built by Khoi Hoang https://github.com/khoih-prog/Portenta_H7_PWM
   Licensed under MIT license
 
-  Now even you use all these new 16 ISR-based timers,with their maximum interval practically unlimited (limited only by
-  unsigned long miliseconds), you just consume only one Portenta_H7 STM32 timer and avoid conflicting with other cores' tasks.
-  The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
-  Therefore, their executions are not blocked by bad-behaving functions / tasks.
-  This important feature is absolutely necessary for mission-critical tasks.
-
-  Version: 2.0.2
+  Version: 2.0.3
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -20,6 +14,7 @@
   2.0.0   K.Hoang      10/12/2021 Use new library code and examples
   2.0.1   K.Hoang      11/12/2021 Fix PWM_Multi example. Temporary fix polarity for HRTIM PWM
   2.0.2   K.Hoang      07/02/2022 Convert to h-only. Optimize code.
+  2.0.3   K.Hoang      21/01/2023 Add `PWM_StepperControl` example
 *****************************************************************************************************************************/
 
 #pragma once
@@ -34,13 +29,13 @@
 #endif
 
 #ifndef PORTENTA_H7_PWM_VERSION
-  #define PORTENTA_H7_PWM_VERSION             "Portenta_H7_PWM v2.0.2"
+  #define PORTENTA_H7_PWM_VERSION             "Portenta_H7_PWM v2.0.3"
   
   #define PORTENTA_H7_PWM_VERSION_MAJOR       2
   #define PORTENTA_H7_PWM_VERSION_MINOR       0
-  #define PORTENTA_H7_PWM_VERSION_PATCH       2
+  #define PORTENTA_H7_PWM_VERSION_PATCH       3
 
-  #define PORTENTA_H7_PWM_VERSION_INT         2000002
+  #define PORTENTA_H7_PWM_VERSION_INT         2000003
 #endif
 
 
