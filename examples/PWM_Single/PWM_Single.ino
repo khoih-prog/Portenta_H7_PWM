@@ -5,12 +5,6 @@
 
   Built by Khoi Hoang https://github.com/khoih-prog/Portenta_H7_PWM
   Licensed under MIT license
-
-  Now even you use all these new 16 ISR-based timers,with their maximum interval practically unlimited (limited only by
-  unsigned long miliseconds), you just consume only one Portenta_H7 STM32 timer and avoid conflicting with other cores' tasks.
-  The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
-  Therefore, their executions are not blocked by bad-behaving functions / tasks.
-  This important feature is absolutely necessary for mission-critical tasks.
 *****************************************************************************************************************************/
 
 #if !( defined(ARDUINO_PORTENTA_H7_M7) || defined(ARDUINO_PORTENTA_H7_M4) )
@@ -28,7 +22,7 @@
 // Can't use same TimerIndex again, e.g., the D1 and D2, using TIM1, can't be use concurrently
 // That's why D0, D1, D3, D4 and D6 (using TimerIndex 8, 1, HRTIM and 3) are OK together
 
-// Only OK for D0, D1, D2, D4 and D5, PA_0C(D15/A0), PA_1C(D16/A1), 
+// Only OK for D0, D1, D2, D4 and D5, PA_0C(D15/A0), PA_1C(D16/A1),
 // D3, D6, D7, D8, D9, D10, D11, D12, D13, D14, D17(PC_2C/A2), D18(PC_3C/3), PC2(D19/A4) LEDG, LEDB not OK
 #define pinD0    D0       // PH15 / TIM8_CH3N
 #define pinD1    D1       // PK1  / TIM1_CH1, TIM8_CH3
@@ -39,10 +33,10 @@
 #define pinD6    D6       // PA8  / HRTIM_CHB2 (TIM1_CH1, TIM8_BKIN2)
 
 // See https://www.st.com/resource/en/datasheet/stm32h747xi.pdf, Table 7, page 53
-// Can't use pins with same TIMx. For example, 
+// Can't use pins with same TIMx. For example,
 // pinD1 and pinD2, using same TIM1, can't be used at the same time
 // pinD4 and pinD5, using same TIM3, can't be used at the same time
-// pinD3 and pinD6 are using HRTIM, can't be used at the same time and the minimum freq must be ~770Hz 
+// pinD3 and pinD6 are using HRTIM, can't be used at the same time and the minimum freq must be ~770Hz
 uint32_t myPin  = pinD5;
 
 float dutyCycle = 50.0f;
@@ -70,10 +64,10 @@ void restorePWM()
   digitalWrite(LEDG, LED_ON);
   digitalWrite(LEDB, LED_OFF);
   digitalWrite(LEDR, LED_OFF);
-  
+
   curFreq      = freq;
   curDutyCycle = dutyCycle;
-  
+
   // setPWM(mbed::PwmOut* &pwm, pin_size_t pin, float frequency, float dutyCycle)
   setPWM(pwm, myPin, freq, dutyCycle);
 }
@@ -83,10 +77,10 @@ void changePWM()
   digitalWrite(LEDG, LED_OFF);
   digitalWrite(LEDB, LED_ON);
   digitalWrite(LEDR, LED_OFF);
-  
+
   curFreq      = freq * 2;
   curDutyCycle = dutyCycle / 2;
-  
+
   // setPWM(mbed::PwmOut* &pwm, pin_size_t pin, float frequency, float dutyCycle)
   setPWM(pwm, myPin, curFreq, curDutyCycle);
 }
@@ -96,10 +90,10 @@ void stopMyPWM()
   digitalWrite(LEDG, LED_OFF);
   digitalWrite(LEDB, LED_OFF);
   digitalWrite(LEDR, LED_ON);
-  
+
   curFreq      = 1000.0f;
   curDutyCycle = 0.0f;
-  
+
   //stopPWM(mbed::PwmOut* &pwm, pin_size_t pin)
   stopPWM(pwm, myPin);
 }
@@ -116,12 +110,12 @@ void printPulseWidth()
   if (num++ % 50 == 0)
   {
     printLine();
-    
+
     Serial.print(F("PW (us)"));
 
     printLine();
   }
- 
+
   if (num > 1)
   {
     if (pwm)
@@ -129,11 +123,13 @@ void printPulseWidth()
       if ( (myPin == pinD3) || (myPin == pinD6) )
       {
         // Using HRTIM => fake by calculating PW
-        Serial.print( (10000 * curDutyCycle) / curFreq ); Serial.print(F("\t\t")); 
+        Serial.print( (10000 * curDutyCycle) / curFreq );
+        Serial.print(F("\t\t"));
       }
       else
       {
-        Serial.print((float) pwm->read_pulsewitdth_us()); Serial.print(F("\t\t")); 
+        Serial.print((float) pwm->read_pulsewitdth_us());
+        Serial.print(F("\t\t"));
       }
     }
 
@@ -161,10 +157,10 @@ void check_status()
 
   if ( (millis() > changePWM_timeout) && (millis() > CHANGE_INTERVAL) )
   {
-    
+
     if (PWM_orig)
     {
-      if (count++ %2 == 0)
+      if (count++ % 2 == 0)
       {
         Serial.println("Stop PWM");
         stopMyPWM();
@@ -172,7 +168,7 @@ void check_status()
       else
       {
         Serial.println("Change PWM");
-        
+
         changePWM();
 
         PWM_orig = !PWM_orig;
@@ -181,12 +177,12 @@ void check_status()
     else
     {
       Serial.println("Restore PWM");
-      
+
       restorePWM();
 
       PWM_orig = !PWM_orig;
     }
-      
+
     changePWM_timeout = millis() + CHANGE_INTERVAL;
   }
 }
@@ -205,11 +201,13 @@ void setup()
   digitalWrite(myPin, LOW);
 
   Serial.begin(115200);
+
   while (!Serial);
 
   delay(100);
 
-  Serial.print(F("\nStarting PWM_Single on ")); Serial.println(BOARD_NAME);
+  Serial.print(F("\nStarting PWM_Single on "));
+  Serial.println(BOARD_NAME);
   Serial.println(PORTENTA_H7_PWM_VERSION);
 
   // Automatically retrieve TIM instance and channel associated to pin
