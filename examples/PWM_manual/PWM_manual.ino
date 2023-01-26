@@ -75,8 +75,8 @@ void loop()
   // Update DC every UPDATE_INTERVAL (1000) milliseconds
   if (millis() > update_timeout)
   {
-    //setPWM_DCPercentage_manual(pwm, myPin, dutycyclePercent);
-    setPWM(pwm, myPin, frequency, dutycyclePercent);
+    setPWM_DCPercentage_manual(pwm, myPin, dutycyclePercent);
+    //setPWM(pwm, myPin, frequency, dutycyclePercent);
 
     dutycyclePercent += DCStepPercent;
 
