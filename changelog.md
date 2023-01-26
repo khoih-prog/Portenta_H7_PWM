@@ -27,6 +27,12 @@
 
 ## Changelog
 
+### Releases v2.1.0
+
+1. Add example [PWM_manual](https://github.com/khoih-prog/Portenta_H7_PWM/tree/main/examples/PWM_manual) to demo how to correctly use PWM to generate waveform. Check [About DCValue in setPWM_manual #2](https://github.com/khoih-prog/AVR_PWM/discussions/2)
+2. Add function `setPWM_DCPercentage_manual()` to facilitate the setting PWM DC manually by using `DCPercentage`
+3. Optimize for PWM speed when changing `dutycycle` while using same `frequency`
+
 ### Releases v2.0.3
 
 1. Add example [PWM_StepperControl](https://github.com/khoih-prog/Portenta_H7_PWM/examples/PWM_StepperControl) to demo how to control Stepper Motor using PWM. Check [Using PWM to step a stepper driver #16](https://github.com/khoih-prog/RP2040_PWM/issues/16)

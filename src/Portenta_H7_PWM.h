@@ -6,7 +6,7 @@
   Built by Khoi Hoang https://github.com/khoih-prog/Portenta_H7_PWM
   Licensed under MIT license
 
-  Version: 2.0.3
+  Version: 2.1.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -15,6 +15,7 @@
   2.0.1   K.Hoang      11/12/2021 Fix PWM_Multi example. Temporary fix polarity for HRTIM PWM
   2.0.2   K.Hoang      07/02/2022 Convert to h-only. Optimize code.
   2.0.3   K.Hoang      21/01/2023 Add `PWM_StepperControl` example
+  2.1.0   K.Hoang      24/01/2023 Add `PWM_manual` example and related function. Optimize for speed
 *****************************************************************************************************************************/
 
 #pragma once

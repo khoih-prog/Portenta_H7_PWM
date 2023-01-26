@@ -41,10 +41,12 @@
   * [ 2. PWM_Single](examples/PWM_Single)
   * [ 3. multiFileProject](examples/multiFileProject)
   * [ 4. PWM_StepperControl](examples/PWM_StepperControl). **New**
+  * [ 5. PWM_manual](examples/PWM_manual) **New**
 * [Example PWM_Multi](#example-PWM_Multi)
 * [Debug Terminal Output Samples](#debug-terminal-output-samples)
   * [1. PWM_Single on PORTENTA_H7_M7](#1-PWM_Single-on-PORTENTA_H7_M7)
   * [2. PWM_Multi on PORTENTA_H7_M7](#2-PWM_Multi-on-PORTENTA_H7_M7)
+  * [3. PWM_manual on PORTENTA_H7_M7](#3-PWM_manual-on-PORTENTA_H7_M7) 
 * [Debug](#debug)
 * [Troubleshooting](#troubleshooting)
 * [Issues](#issues)
@@ -440,6 +442,39 @@ void setup()
 }  
 ```
 
+#### 3. Set or change PWM frequency and dutyCycle manually and efficiently in waveform creation
+
+Function prototype
+
+```cpp
+mbed::PwmOut* setPWM(mbed::PwmOut* &pwm, const pin_size_t& pin, const float& frequency, const float& dutyCycle);
+mbed::PwmOut* setPWM_DCPercentage_manual(mbed::PwmOut* &pwm, const pin_size_t& pin, const float& DCPercentage);
+```
+
+Need to call only once for each pin
+
+
+```cpp
+mbed::PwmOut* pwm   = nullptr;
+...
+setPWM(pwm, myPin, frequency, 0);
+```
+
+after that, if you wish to change both `dutyCycle` and `frequency`
+
+```cpp
+// For 50.0f dutycycle
+new_DCPercentage = 50.0f;
+setPWM(pwm, myPin, frequency, dutycyclePercent);
+```
+
+or better and much easier to use to change just `dutycycle` while using same `frequency`
+
+```cpp
+new_DCPercentage = 50.0f;
+setPWM_DCPercentage_manual(pwm, myPin, new_DCPercentage);
+```
+
 ---
 ---
 
@@ -449,6 +484,7 @@ void setup()
  2. [PWM_Single](examples/PWM_Single)
  3. [multiFileProject](examples/multiFileProject)
  4. [**PWM_StepperControl**](examples/PWM_StepperControl) **New**
+ 5. [PWM_manual](examples/PWM_manual) **New**
 
  
 ---
@@ -471,7 +507,7 @@ The following is the sample terminal output when running example [PWM_Single](ex
 
 ```cpp
 Starting PWM_Single on PORTENTA_H7_M7
-Portenta_H7_PWM v2.0.3
+Portenta_H7_PWM v2.1.0
 [PWM] Freq = 5000.00, DutyCycle % = 50.00, DutyCycle = 0.50, Pin = 5
 
 ========
@@ -506,7 +542,7 @@ The following is the sample terminal output when running example [**PWM_Multi**]
 
 ```cpp
 Starting PWM_Multi on PORTENTA_H7_M7
-Portenta_H7_PWM v2.0.3
+Portenta_H7_PWM v2.1.0
 [PWM] Freq = 1000.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 0
 [PWM] Freq = 2500.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 1
 [PWM] Freq = 4000.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 3
@@ -534,6 +570,42 @@ Change all PWM
 Restore all PWM
 500.00		200.00		125.00		100.00		
 500.00		200.00		125.00		100.00	
+```
+
+---
+
+### 3. PWM_manual on PORTENTA_H7_M7
+
+The following is the sample terminal output when running example [**PWM_manual**](examples/PWM_manual) on **Portenta_H7** to demonstrate how to use the `setPWM_manual()` and `setPWM_DCPercentage_manual()` functions in wafeform creation
+
+
+```cpp
+Starting PWM_manual on PORTENTA_H7_M7
+Portenta_H7_PWM v2.1.0
+[PWM] Freq = 1000.00, 	DutyCycle % = 0.00, 	DutyCycle = 0.00, 	Pin = 5
+[PWM] New pwm
+[PWM] Freq = 1000.00, 	DutyCycle % = 0.00, 	DutyCycle = 0.00, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 5.00, 	DutyCycle = 0.05, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 10.00, 	DutyCycle = 0.10, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 15.00, 	DutyCycle = 0.15, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 20.00, 	DutyCycle = 0.20, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 25.00, 	DutyCycle = 0.25, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 30.00, 	DutyCycle = 0.30, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 35.00, 	DutyCycle = 0.35, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 40.00, 	DutyCycle = 0.40, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 45.00, 	DutyCycle = 0.45, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 50.00, 	DutyCycle = 0.50, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 55.00, 	DutyCycle = 0.55, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 60.00, 	DutyCycle = 0.60, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 65.00, 	DutyCycle = 0.65, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 70.00, 	DutyCycle = 0.70, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 75.00, 	DutyCycle = 0.75, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 80.00, 	DutyCycle = 0.80, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 85.00, 	DutyCycle = 0.85, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 90.00, 	DutyCycle = 0.90, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 95.00, 	DutyCycle = 0.95, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 100.00, 	DutyCycle = 1.00, 	Pin = 5
+[PWM] Freq = 1000.00, 	DutyCycle % = 0.00, 	DutyCycle = 0.00, 	Pin = 5
 ```
 
 

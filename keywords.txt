@@ -17,6 +17,7 @@ isValidPWMDutyCycle	KEYWORD2
 isUsingHRTIM  KEYWORD2
 isValidPWMSettings	KEYWORD2
 setPWM	KEYWORD2
+setPWM_DCPercentage_manual  KEYWORD2
 stopPWM	KEYWORD2
 
 
