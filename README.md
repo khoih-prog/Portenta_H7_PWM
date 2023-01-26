@@ -36,6 +36,7 @@
 * [Usage](#usage)
   * [1. Prepare PWM settings](#1-Prepare-PWM-settings)
   * [2. Set PWM Frequency and dutycycle](#2-Set-PWM-Frequency-and-dutycycle)
+  * [3. Set or change PWM frequency and dutyCycle manually and efficiently in waveform creation](#3-Set-or-change-PWM-frequency-and-dutyCycle-manually-and-efficiently-in-waveform-creation)
 * [Examples](#examples)
   * [ 1. PWM_Multi](examples/PWM_Multi)
   * [ 2. PWM_Single](examples/PWM_Single)
@@ -651,12 +652,17 @@ Submit issues to: [Portenta_H7_PWM issues](https://github.com/khoih-prog/Portent
 
 ## DONE
 
-1. Basic hardware multi-channel PWM for **Portenta_H7**.
-2. Add Table of Contents
-3. Rewrite the library to fix bug and to permit to start, stop, modify, restore PWM settings on-the-fly
-4. Optimize library code by using `reference-passing` instead of `value-passing`
-5. Convert to `h-only` style
-6. Add example [PWM_StepperControl](https://github.com/khoih-prog/Portenta_H7_PWM/examples/PWM_StepperControl) to demo how to control Stepper Motor using PWM
+ 1. Basic hardware multi-channel PWM for **Portenta_H7**.
+ 2. Add Table of Contents
+ 3. Rewrite the library to fix bug and to permit to start, stop, modify, restore PWM settings on-the-fly
+ 4. Optimize library code by using `reference-passing` instead of `value-passing`
+ 5. Convert to `h-only` style
+ 6. Add example [PWM_StepperControl](https://github.com/khoih-prog/Portenta_H7_PWM/examples/PWM_StepperControl) to demo how to control Stepper Motor using PWM
+ 7. Add example [PWM_manual](https://github.com/khoih-prog/Portenta_H7_PWM/tree/main/examples/PWM_manual) to demo how to correctly use PWM to generate waveform
+ 8. Add function `setPWM_DCPercentage_manual()` to facilitate the setting PWM DC manually by using `DCPercentage`
+ 9. Optimize for PWM speed when changing `dutycycle` while using same `frequency`
+
+
 
 ---
 ---

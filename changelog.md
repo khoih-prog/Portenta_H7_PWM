@@ -16,6 +16,7 @@
 ## Table of Contents
 
 * [Changelog](#changelog)
+  * [Releases v2.1.0](#Releases-v210)
   * [Releases v2.0.3](#Releases-v203)
   * [Releases v2.0.2](#Releases-v202)
   * [Releases v2.0.1](#Releases-v201)
